@@ -1,0 +1,165 @@
+defaults:
+  version: "1.0"
+  difficulty: easy
+  runtime_limit_seconds: 120
+  automated_checks:
+    forbidden_imports: [requests, socket, urllib, subprocess, pathlib.Path.home]
+    required_scene_class: MainScene
+    max_duration_seconds: 120
+    fps: 60
+tasks:
+  - id: easy_shapes_transform_timeline
+    domains: [manim_basics, geometry]
+    title: Shapes, Labels, And Transform Timeline
+    prompt: >
+      Create a concise ManimCE animation introducing Circle, Square, Triangle,
+      and Arrow objects. Label every object, group them into a clean layout, and
+      animate Create, Transform, FadeOut, and ReplacementTransform with a small
+      labeled timeline explaining each animation type.
+    required_labels: [Circle, Square, Triangle, Arrow, Create, Transform, FadeOut, ReplacementTransform, timeline]
+    required_visuals: [basic shapes, grouped layout, labeled animation timeline]
+    rubric:
+      math_correctness: Geometry terms are simple but labels must match objects.
+      manim_idiom: Uses Manim mobjects and animations idiomatically.
+      visual_clarity: Timeline and object labels are readable.
+
+  - id: easy_pythagorean_theorem_area
+    domains: [geometry, algebra, proof]
+    title: Pythagorean Theorem Area Explanation
+    prompt: >
+      Animate a right triangle with side lengths a, b, and c. Construct squares
+      on each side, label areas a^2, b^2, and c^2, and visually explain why
+      a^2 + b^2 = c^2.
+    required_labels: [a, b, c, a^2, b^2, c^2, a^2 + b^2 = c^2, right angle]
+    required_visuals: [right triangle, side squares, area comparison]
+    rubric:
+      math_correctness: Correctly represents the theorem through area.
+      visual_clarity: All sides, squares, and equations are labeled.
+      animation_quality: Area relationship is animated rather than only stated.
+
+  - id: easy_quadratic_graph_features
+    domains: [algebra, graphing]
+    title: Quadratic Graph Feature Labels
+    prompt: >
+      Plot y = x^2 - 4x + 3. Label axes, equation, graph, vertex, x-intercepts,
+      y-intercept, and axis of symmetry. Show how y = (x - 2)^2 - 1 explains
+      the vertex.
+    required_labels: [y = x^2 - 4x + 3, y = (x - 2)^2 - 1, vertex, x-intercepts, y-intercept, axis of symmetry]
+    required_visuals: [coordinate axes, parabola, intercept markers, vertex marker]
+    rubric:
+      math_correctness: Vertex and intercepts are correct.
+      visual_clarity: Graph annotations do not overlap.
+      animation_quality: Form conversion supports the graph explanation.
+
+  - id: easy_vector_addition_2d
+    domains: [linear_algebra, vectors]
+    title: 2D Vector Addition
+    prompt: >
+      Visualize u = (2, 1), v = (1, 2), and u + v = (3, 3) using arrows on a
+      coordinate grid. Label each vector, coordinates, tail-to-head placement,
+      and the component-wise addition equation.
+    required_labels:
+      - u = (2, 1)
+      - v = (1, 2)
+      - u + v = (3, 3)
+      - tail-to-head
+      - x component
+      - y component
+    required_visuals: [coordinate grid, vector arrows, resultant vector, component labels]
+    rubric:
+      math_correctness: Component addition and resultant are correct.
+      visual_clarity: Arrows and coordinates are distinguishable.
+      animation_quality: Tail-to-head motion is clear.
+
+  - id: easy_unit_circle_trig
+    domains: [trigonometry, geometry]
+    title: Unit Circle Trigonometry
+    prompt: >
+      Animate a point moving on the unit circle to angle theta. Label theta,
+      cos(theta), sin(theta), tan(theta), the point (cos theta, sin theta), axes,
+      radius 1, and key angles 0, pi/2, pi, and 3pi/2.
+    required_labels:
+      - theta
+      - cos(theta)
+      - sin(theta)
+      - tan(theta)
+      - radius 1
+      - (cos theta, sin theta)
+      - 0
+      - pi/2
+      - pi
+      - 3pi/2
+    required_visuals: [unit circle, angle arc, sine segment, cosine segment, tangent line]
+    rubric:
+      math_correctness: Trig quantities correspond to the unit circle.
+      visual_clarity: Labels fit and remain legible.
+      animation_quality: Moving point drives the explanation.
+
+  - id: easy_geometric_series_sum
+    domains: [algebra, sequences]
+    title: Finite Geometric Series As Areas
+    prompt: >
+      Show the finite geometric series 1/2 + 1/4 + 1/8 + 1/16 approaching 1
+      by subdividing a unit square or bar. Label each term, partial sums, limit,
+      and equation S_n = 1 - (1/2)^n.
+    required_labels: [1/2, 1/4, 1/8, 1/16, partial sum, limit 1, S_n = 1 - (1/2)^n]
+    required_visuals: [subdivided unit shape, colored terms, partial sum progression]
+    rubric:
+      math_correctness: Partial sums and limit are represented accurately.
+      visual_clarity: Term areas are easy to compare.
+      animation_quality: Accumulation communicates convergence.
+
+  - id: easy_probability_dice_distribution
+    domains: [probability, statistics]
+    title: Two Dice Sum Distribution
+    prompt: >
+      Build a labeled bar chart for the distribution of the sum of two fair
+      dice. Show sample outcomes, label sums 2 through 12, counts, probabilities,
+      and explain why 7 is most likely.
+    required_labels: [two fair dice, sum, count, probability, 2, 7, 12, most likely]
+    required_visuals: [dice examples, bar chart, highlighted sum 7]
+    rubric:
+      math_correctness: Counts for sums are correct.
+      visual_clarity: Bars and probabilities are labeled.
+      animation_quality: Outcome examples connect to chart bars.
+
+  - id: easy_modular_clock_arithmetic
+    domains: [number_theory, modular_arithmetic]
+    title: Modular Arithmetic On A Clock
+    prompt: >
+      Use a 12-hour clock to explain 9 + 5 = 2 mod 12. Animate five steps from
+      9, label congruence, residue class, modulo 12, and include the equation
+      9 + 5 ≡ 2 (mod 12).
+    required_labels: [9 + 5, 2, mod 12, congruence, residue class, 9 + 5 ≡ 2 (mod 12)]
+    required_visuals: [clock, step arrows, highlighted result]
+    rubric:
+      math_correctness: Modular result and notation are correct.
+      visual_clarity: Clock positions and equation are labeled.
+      animation_quality: Step animation shows wraparound.
+
+  - id: easy_graph_bfs_intro
+    domains: [discrete_math, graph_theory]
+    title: Breadth First Search Layers
+    prompt: >
+      Draw a small graph and animate breadth-first search from a source vertex.
+      Label source, queue, visited vertices, layer 0, layer 1, layer 2, and
+      shortest-path distance.
+    required_labels: [source, queue, visited, layer 0, layer 1, layer 2, shortest-path distance]
+    required_visuals: [graph nodes, graph edges, BFS layer highlights, queue display]
+    rubric:
+      math_correctness: BFS order and distances are plausible and consistent.
+      visual_clarity: Queue and layers are readable.
+      animation_quality: Traversal progresses step by step.
+
+  - id: easy_polar_rose_curve
+    domains: [graphing, polar_coordinates]
+    title: Polar Rose Curve
+    prompt: >
+      Plot r = cos(3 theta) as a polar rose. Label polar axes, theta, r,
+      equation, petals, symmetry, and at least three key angle samples.
+    required_labels: [r = cos(3 theta), polar axes, theta, r, petals, symmetry, key angle]
+    required_visuals: [polar grid, rose curve, angle samples, petal labels]
+    rubric:
+      math_correctness: Rose shape matches the equation.
+      visual_clarity: Polar labels and samples are legible.
+      animation_quality: Curve construction explains polar plotting.

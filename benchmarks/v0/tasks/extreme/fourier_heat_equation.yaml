@@ -1,0 +1,36 @@
+id: extreme_fourier_heat_equation
+version: "1.0"
+difficulty: extreme
+domains: [differential_equations, fourier_analysis, mathematical_physics]
+title: Fourier Modes Solving The Heat Equation
+runtime_limit_seconds: 120
+prompt: >
+  Create a ManimCE animation that explains how Fourier modes solve the one
+  dimensional heat equation u_t = alpha u_xx on 0 <= x <= L with zero boundary
+  conditions. Show the PDE, boundary conditions, separation of variables,
+  sine eigenmodes, Fourier coefficients, and the exponential decay of high
+  frequency modes. Animate an initial temperature profile decomposing into
+  labeled modes and recombining as heat diffuses over time.
+required_labels:
+  - u_t = alpha u_xx
+  - u(0,t)=u(L,t)=0
+  - separation of variables
+  - sine eigenmodes
+  - Fourier coefficients
+  - exponential decay
+  - initial condition
+  - heat diffusion
+required_visuals:
+  - PDE and boundary conditions
+  - mode decomposition
+  - time evolution
+  - recombined solution
+automated_checks:
+  forbidden_imports: [requests, socket, urllib, subprocess, pathlib.Path.home]
+  required_scene_class: MainScene
+  max_duration_seconds: 120
+  fps: 60
+rubric:
+  math_correctness: Correct separation, eigenmodes, coefficients, and decay intuition.
+  visual_clarity: PDE, modes, coefficients, and evolving solution are labeled.
+  animation_quality: The derivation and animation form a coherent explanatory sequence.

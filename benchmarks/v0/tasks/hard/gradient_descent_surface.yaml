@@ -1,0 +1,34 @@
+id: hard_gradient_descent_surface
+version: "1.0"
+difficulty: hard
+domains: [optimization, multivariable_calculus, numerical_methods]
+title: Gradient Descent On A Convex Surface
+runtime_limit_seconds: 120
+prompt: >
+  Create a ManimCE animation explaining gradient descent on
+  f(x, y) = x^2 + 2y^2. Show the surface or contour plot, the negative gradient
+  direction, the update rule, and a sequence of iterates converging to the
+  minimum. Label the function, gradient, learning rate, each iterate, the
+  minimum, and why the path descends.
+required_labels:
+  - f(x, y) = x^2 + 2y^2
+  - gradient
+  - negative gradient
+  - learning rate
+  - update rule
+  - minimum
+  - iterate
+required_visuals:
+  - surface or contour plot
+  - descent path
+  - arrows for update directions
+  - convergence marker
+automated_checks:
+  forbidden_imports: [requests, socket, urllib, subprocess, pathlib.Path.home]
+  required_scene_class: MainScene
+  max_duration_seconds: 120
+  fps: 60
+rubric:
+  math_correctness: Correct gradient, update rule, and convergence behavior.
+  visual_clarity: Function, iterates, arrows, and minimum are readable.
+  animation_quality: The path and labels make the optimization process intuitive.

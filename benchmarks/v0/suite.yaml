@@ -1,0 +1,19 @@
+id: manimbench-v0
+version: "0.1.0"
+title: ManimBench v0 Representative Suite
+description: >
+  A small representative suite for validating the ManimBench runner, sandbox,
+  scoring, and report pipeline before expanding to the full public benchmark.
+runtime:
+  manim: community
+  fps: 60
+  max_duration_seconds: 120
+  scene_class: MainScene
+tasks:
+  - tasks/easy/pythagorean_theorem.yaml
+  - tasks/easy/quadratic_graph.yaml
+  - tasks/medium/taylor_series_sine.yaml
+  - tasks/medium/eigenvectors_2d.yaml
+  - tasks/hard/complex_mapping.yaml
+  - tasks/hard/gradient_descent_surface.yaml
+  - tasks/extreme/fourier_heat_equation.yaml

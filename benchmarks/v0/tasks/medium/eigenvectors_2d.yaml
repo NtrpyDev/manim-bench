@@ -1,0 +1,33 @@
+id: medium_eigenvectors_2d
+version: "1.0"
+difficulty: medium
+domains: [linear_algebra, transformations]
+title: Eigenvectors As Invariant Directions
+runtime_limit_seconds: 120
+prompt: >
+  Create a ManimCE animation showing the matrix A = [[2, 1], [1, 2]] acting on
+  the plane. Animate a grid transformation, label the matrix, show at least two
+  ordinary vectors changing direction, and highlight the two eigenvector
+  directions that only scale. Label eigenvalues, eigenvectors, input vectors,
+  transformed vectors, and the equation Av = lambda v.
+required_labels:
+  - A = [[2, 1], [1, 2]]
+  - eigenvector
+  - eigenvalue
+  - Av = lambda v
+  - input vector
+  - transformed vector
+required_visuals:
+  - coordinate grid
+  - matrix transformation
+  - ordinary vectors
+  - invariant eigenvector directions
+automated_checks:
+  forbidden_imports: [requests, socket, urllib, subprocess, pathlib.Path.home]
+  required_scene_class: MainScene
+  max_duration_seconds: 120
+  fps: 60
+rubric:
+  math_correctness: Eigenvectors and eigenvalues match the given matrix.
+  visual_clarity: The transformed grid and vectors are labeled and distinguishable.
+  animation_quality: The animation makes invariant directions visually obvious.

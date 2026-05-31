@@ -1,0 +1,32 @@
+id: easy_pythagorean_theorem
+version: "1.0"
+difficulty: easy
+domains: [geometry, algebra, proof]
+title: Labeled Pythagorean Theorem Animation
+runtime_limit_seconds: 120
+prompt: >
+  Create a ManimCE animation that visually explains the Pythagorean theorem.
+  Show a right triangle, label side lengths a, b, and c, construct labeled
+  squares on each side, and animate why the two smaller square areas sum to the
+  larger square area. Include the equation a^2 + b^2 = c^2 and label each area.
+required_labels:
+  - a
+  - b
+  - c
+  - a^2
+  - b^2
+  - c^2
+  - a^2 + b^2 = c^2
+required_visuals:
+  - right triangle
+  - squares on all three sides
+  - area relationship
+automated_checks:
+  forbidden_imports: [requests, socket, urllib, subprocess, pathlib.Path.home]
+  required_scene_class: MainScene
+  max_duration_seconds: 120
+  fps: 60
+rubric:
+  math_correctness: Correctly represents the Pythagorean relation and area proof intuition.
+  visual_clarity: All sides, squares, and equations are labeled and readable.
+  animation_quality: Transformations make the area relation easier to understand.

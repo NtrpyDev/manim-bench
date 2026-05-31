@@ -1,0 +1,22 @@
+id: manimbench-v1-public
+version: "1.0.0"
+title: ManimBench v1 Public Suite
+description: >
+  Public benchmark suite for evaluating ManimCE code generation, mathematical
+  reasoning, visual explanation, labeling discipline, and sandboxed rendering
+  across progressively harder mathematical animation tasks.
+runtime:
+  manim: community
+  fps: 60
+  max_duration_seconds: 120
+  scene_class: MainScene
+policy:
+  official_backend: container
+  local_backend: development_only
+  label_verification: source_proxy_plus_human_review
+  public_site: manimbench.site
+task_packs:
+  - tasks/easy.yaml
+  - tasks/medium.yaml
+  - tasks/hard.yaml
+  - tasks/extreme.yaml

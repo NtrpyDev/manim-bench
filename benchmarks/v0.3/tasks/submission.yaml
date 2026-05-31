@@ -1,0 +1,147 @@
+id: submission
+version: "0.3.0"
+difficulty: composite
+domains:
+  - mathematical communication
+  - calculus
+  - linear algebra
+  - geometry
+  - probability
+  - advanced mathematics
+title: One Final ManimBench V0.3 Reviewable Showcase
+runtime_limit_seconds: 120
+prompt: |
+  Create one polished Manim Community Edition animation that demonstrates your
+  ability to visually explain mathematics in one cohesive public benchmark
+  video. The final render must be a single MP4 under 120 seconds, not a set of
+  unrelated clips.
+
+  The video must contain exactly these clearly titled sections:
+
+  1. Basic Manim control
+     - Show shapes, labels, color, transforms, layout, and timing.
+     - Include a visible section title and one quantitative label.
+
+  2. Calculus
+     - Show labeled axes, a function graph, and either a derivative tangent or
+       an integral area.
+     - Include a visible equation tying the visual to the math.
+
+  3. Linear algebra
+     - Show vectors or a matrix transformation with basis vectors, coordinates,
+       and the transformed result labeled.
+     - Include a visible matrix or vector equation.
+
+  4. Geometry
+     - Show a precise diagram where lengths, angles, regions, and equations are
+       positioned correctly without covering each other.
+     - Labels must be readable and outside the objects they annotate when
+       possible.
+
+  5. Probability
+     - Show a distribution, sampling process, or probability calculation with
+       labeled outcomes and quantities.
+     - Include a visible probability equation.
+
+  6. Advanced reasoning
+     - Give a concise visual explanation of one harder concept such as Fourier
+       modes, eigenvalues, topology, complex mappings, dynamical systems, or
+       differential equations.
+     - Include a visible title, equation, and diagram or graph.
+
+  The submission is judged visually. Avoid squished text, overlapping labels,
+  incorrect geometry, unreadable equations, missing sections, decorative filler,
+  fake visuals, static screenshots, and superficial hardcoded answers. Use
+  Manim objects, equations, graphs, animations, and labels directly in code.
+
+  Define exactly one primary scene class named MainScene.
+required_labels:
+  - ManimBench V0.3
+  - Basic Manim control
+  - Calculus
+  - Linear algebra
+  - Geometry
+  - Probability
+  - Advanced reasoning
+  - derivative
+  - integral
+  - vector
+  - matrix
+  - probability
+required_visuals:
+  - labeled section title for Basic Manim control
+  - labeled section title for Calculus
+  - labeled section title for Linear algebra
+  - labeled section title for Geometry
+  - labeled section title for Probability
+  - labeled section title for Advanced reasoning
+  - labeled axes and function graph
+  - derivative tangent or integral area
+  - vector or matrix transformation
+  - precise geometry diagram
+  - probability distribution or sampling visual
+  - advanced mathematical graph or diagram
+automated_checks:
+  required_scene_class: MainScene
+  min_required_labels: 9
+  fps: 60
+  max_duration_seconds: 120
+  required_sections:
+    - label: Basic Manim control
+      required_terms:
+        - Text
+        - Transform
+        - Circle
+        - Square
+    - label: Calculus
+      required_terms:
+        - Axes
+        - plot
+        - derivative
+        - integral
+    - label: Linear algebra
+      required_terms:
+        - Vector
+        - Matrix
+        - basis
+        - transform
+    - label: Geometry
+      required_terms:
+        - Polygon
+        - Angle
+        - length
+        - area
+    - label: Probability
+      required_terms:
+        - probability
+        - distribution
+        - sample
+        - bar
+    - label: Advanced reasoning
+      required_terms:
+        - Fourier
+        - eigen
+        - topology
+        - differential
+        - complex
+        - dynamical
+  required_source_terms:
+    - Axes
+    - MathTex
+    - Text
+    - Vector
+    - Matrix
+    - Polygon
+rubric:
+  geometry_correctness: >
+    Diagrams use correct relative placement and labels do not contradict the
+    geometry.
+  readability: >
+    Text and equations are legible at normal playback size and do not overlap.
+  section_coverage: >
+    All six required sections are visibly present and mathematically meaningful.
+  fake_visuals: >
+    The scene constructs visuals with Manim objects rather than static images or
+    superficial placeholders.
+  shareability: >
+    The final MP4 works as a concise, public-facing benchmark submission.

@@ -1,0 +1,213 @@
+defaults:
+  version: "1.0"
+  difficulty: medium
+  runtime_limit_seconds: 120
+  automated_checks:
+    forbidden_imports: [requests, socket, urllib, subprocess, pathlib.Path.home]
+    required_scene_class: MainScene
+    max_duration_seconds: 120
+    fps: 60
+tasks:
+  - id: medium_riemann_integral_tracker
+    domains: [calculus, graphing, updaters]
+    title: Riemann Sums Converging To An Integral
+    prompt: >
+      Animate Riemann rectangles for f(x)=x^2 on [0,2] with n increasing from
+      4 to 16 using a tracker or staged updates. Label f(x), interval, Delta x,
+      rectangles, area approximation, and integral value 8/3.
+    required_labels:
+      - f(x)=x^2
+      - "[0,2]"
+      - Delta x
+      - rectangles
+      - area approximation
+      - integral
+      - 8/3
+    required_visuals: [axes, function graph, Riemann rectangles, changing n]
+    rubric:
+      math_correctness: Rectangles converge toward the correct integral.
+      manim_idiom: Uses updater/tracker or clean staged transitions.
+      visual_clarity: Area labels and graph remain readable.
+
+  - id: medium_taylor_series_sine_error
+    domains: [calculus, approximation, graphing]
+    title: Taylor Series Sine Approximation
+    prompt: >
+      Plot sin(x) and animate degree 1, 3, 5, and 7 Taylor polynomials around
+      x=0. Label every curve, formula, center, approximation interval, and an
+      error region showing where approximation quality changes.
+    required_labels: [sin(x), x, x - x^3/3!, degree 5, degree 7, x = 0, error, approximation interval]
+    required_visuals: [axes, sine curve, polynomial curves, error cue]
+    rubric:
+      math_correctness: Taylor terms and convergence behavior are correct.
+      visual_clarity: Curves are distinguishable.
+      animation_quality: Progressive approximations support the explanation.
+
+  - id: medium_chain_rule_flow_diagram
+    domains: [calculus, derivatives]
+    title: Chain Rule As Dependency Flow
+    prompt: >
+      Explain d/dx sin(x^2) = 2x cos(x^2) using a labeled dependency diagram
+      x -> x^2 -> sin(x^2), then connect the diagram to the derivative formula.
+      Label inner function, outer function, derivative of inner, derivative of
+      outer, and final result.
+    required_labels: [x, x^2, sin(x^2), inner function, outer function, derivative of inner, derivative of outer, 2x cos(x^2)]
+    required_visuals: [flow diagram, derivative formulas, highlighted composition]
+    rubric:
+      math_correctness: Chain rule steps are correct.
+      visual_clarity: Diagram-to-formula mapping is clear.
+      animation_quality: Highlights show how terms multiply.
+
+  - id: medium_eigenvectors_2d_transform
+    domains: [linear_algebra, transformations]
+    title: Eigenvectors Under A Plane Transformation
+    prompt: >
+      Show A = [[2,1],[1,2]] acting on the plane. Transform a grid, show two
+      ordinary vectors changing direction, and highlight eigenvector directions
+      that only scale. Label eigenvalues, eigenvectors, Av = lambda v, and the
+      matrix.
+    required_labels:
+      - A = [[2,1],[1,2]]
+      - eigenvector
+      - eigenvalue
+      - Av = lambda v
+      - ordinary vector
+      - transformed vector
+    required_visuals: [coordinate grid, matrix transformation, ordinary vectors, eigenvector directions]
+    rubric:
+      math_correctness: Eigenvalues and eigenvectors are correct.
+      visual_clarity: Transformed and original objects are distinguishable.
+      animation_quality: Invariant directions are visually obvious.
+
+  - id: medium_bayes_medical_test
+    domains: [probability, statistics]
+    title: Bayes Theorem Medical Test
+    prompt: >
+      Visualize Bayes theorem with a medical test example. Use a population
+      grid or tree diagram to show prevalence, sensitivity, specificity, false
+      positives, true positives, and posterior probability P(disease | positive).
+    required_labels: [Bayes theorem, prevalence, sensitivity, specificity, false positive, true positive, P(disease | positive)]
+    required_visuals: [population grid or tree, highlighted positives, posterior calculation]
+    rubric:
+      math_correctness: Conditional probability reasoning is correct.
+      visual_clarity: Base-rate effect is visible.
+      animation_quality: Transitions reveal the posterior step by step.
+
+  - id: medium_least_squares_projection
+    domains: [linear_algebra, statistics, optimization]
+    title: Least Squares As Projection
+    prompt: >
+      Explain least squares for fitting y = mx + b by showing data points, a
+      candidate line, residual vectors, squared residuals, and the projection
+      idea. Label residual, squared error, normal equation, and best fit.
+    required_labels: [data, candidate line, residual, squared error, normal equation, best fit, projection]
+    required_visuals: [scatter plot, line fit, residual segments, error labels]
+    rubric:
+      math_correctness: Residual and minimization concepts are correct.
+      visual_clarity: Residuals and fit line are labeled.
+      animation_quality: Improvement toward best fit is clear.
+
+  - id: medium_markov_chain_stationary
+    domains: [probability, linear_algebra, dynamical_systems]
+    title: Markov Chain Converging To Stationary Distribution
+    prompt: >
+      Animate a three-state Markov chain with labeled transition probabilities.
+      Show probability mass moving over several steps, label transition matrix,
+      state vector, stationary distribution, and convergence.
+    required_labels: [transition probability, transition matrix, state vector, stationary distribution, convergence]
+    required_visuals: [state graph, probability bars or dots, matrix update]
+    rubric:
+      math_correctness: State updates and stationary idea are consistent.
+      visual_clarity: Probabilities and states are readable.
+      animation_quality: Iteration visually shows convergence.
+
+  - id: medium_complex_roots_of_unity
+    domains: [complex_analysis, algebra]
+    title: Roots Of Unity On The Complex Plane
+    prompt: >
+      Show the sixth roots of unity on the complex plane. Label z^6 = 1, unit
+      circle, angles 2 pi k / 6, each root, polygon symmetry, and multiplication
+      by e^{2 pi i / 6} as rotation.
+    required_labels:
+      - z^6 = 1
+      - unit circle
+      - 2 pi k / 6
+      - root
+      - symmetry
+      - rotation
+      - e^{2 pi i / 6}
+    required_visuals: [complex plane, unit circle, six roots, regular hexagon]
+    rubric:
+      math_correctness: Root positions and angles are correct.
+      visual_clarity: Roots and angles are labeled.
+      animation_quality: Rotation action is animated.
+
+  - id: medium_cycloid_parametric_curve
+    domains: [geometry, parametric_curves]
+    title: Cycloid From Rolling Circle
+    prompt: >
+      Animate a circle rolling without slipping and trace the cycloid of a point
+      on its rim. Label rolling circle, tracing point, parameter t, equations
+      x=t-sin(t), y=1-cos(t), cusp, and tangent direction.
+    required_labels: [rolling circle, tracing point, t, x=t-sin(t), y=1-cos(t), cusp, tangent direction]
+    required_visuals: [rolling circle, traced parametric curve, moving point]
+    rubric:
+      math_correctness: Cycloid equations and geometry match.
+      visual_clarity: Curve and point labels are readable.
+      animation_quality: Rolling and trace are synchronized.
+
+  - id: medium_3d_vector_field_flow
+    domains: [multivariable_calculus, 3d, vector_fields]
+    title: 3D Vector Field And Flow Lines
+    prompt: >
+      Create a 3D ManimCE scene for a simple vector field F(x,y,z)=(-y,x,0).
+      Label axes, vector field, sample vectors, circular flow lines, camera
+      perspective, and the interpretation as rotation around the z-axis.
+    required_labels:
+      - F(x,y,z)=(-y,x,0)
+      - x-axis
+      - y-axis
+      - z-axis
+      - vector field
+      - flow line
+      - rotation around z-axis
+    required_visuals: [3D axes, sample vectors, circular flow paths, camera movement]
+    rubric:
+      math_correctness: Vector directions match the field.
+      visual_clarity: 3D labels remain understandable.
+      animation_quality: Camera motion clarifies geometry.
+
+  - id: medium_discrete_fourier_signal
+    domains: [fourier_analysis, discrete_math]
+    title: Discrete Fourier Signal Decomposition
+    prompt: >
+      Show a short sampled signal decomposed into two sinusoidal components.
+      Label time samples, frequency components, amplitude, phase, reconstruction,
+      and the idea of DFT coefficients.
+    required_labels: [time samples, frequency component, amplitude, phase, reconstruction, DFT coefficient]
+    required_visuals: [sample dots, component waves, reconstructed signal]
+    rubric:
+      math_correctness: Decomposition idea is accurate.
+      visual_clarity: Components and reconstruction are labeled.
+      animation_quality: Components combine visibly.
+
+  - id: medium_newton_method_roots
+    domains: [numerical_methods, calculus]
+    title: Newton Method Root Finding
+    prompt: >
+      Animate Newton's method for f(x)=x^2-2. Show tangent lines, iterates x_n,
+      update formula x_{n+1}=x_n-f(x_n)/f'(x_n), convergence to sqrt(2), and
+      label each geometric step.
+    required_labels:
+      - f(x)=x^2-2
+      - tangent line
+      - x_n
+      - x_{n+1}
+      - update formula
+      - sqrt(2)
+      - convergence
+    required_visuals: [function graph, tangent lines, iterate markers]
+    rubric:
+      math_correctness: Newton updates converge correctly.
+      visual_clarity: Iterates and tangent intersections are labeled.
+      animation_quality: Each iteration is easy to follow.

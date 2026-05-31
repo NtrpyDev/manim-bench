@@ -1,0 +1,83 @@
+id: submission
+version: "2.0.0"
+difficulty: composite
+domains:
+  - mathematical communication
+  - calculus
+  - linear algebra
+  - geometry
+  - probability
+  - advanced mathematics
+title: One Final ManimBench Showcase Video
+runtime_limit_seconds: 120
+prompt: |
+  Create one polished Manim Community Edition animation that shows your best
+  ability to visually explain mathematics. The final render must be a single
+  cohesive video, not a set of unrelated task clips. It should feel like a
+  compact public benchmark submission that can be shared directly.
+
+  The video must include clearly separated sections that demonstrate:
+
+  1. Basic Manim control: shapes, text, transforms, layout, and timing.
+  2. Graphing and calculus: axes, a function graph, a derivative or integral
+     interpretation, and a labeled equation tying the visual to the math.
+  3. Linear algebra: vectors or a matrix transformation with basis vectors,
+     coordinates, and the transformed result labeled.
+  4. Geometry: a precise diagram where lengths, angles, regions, and equations
+     are positioned correctly without covering each other.
+  5. Probability or statistics: a distribution, sampling idea, or probability
+     calculation with labeled outcomes and quantities.
+  6. Advanced reasoning: a concise visual explanation of one harder concept
+     such as Fourier modes, eigenvalues, topology, complex mappings, dynamical
+     systems, or differential equations.
+
+  The animation should be information-dense and readable. Avoid squished text,
+  overlapping labels, unlabeled objects, decorative filler, fake math, and
+  hardcoded images that bypass Manim construction. Use Manim objects, equations,
+  graphs, animations, and labels directly in code.
+
+  Define exactly one primary scene class named MainScene. The rendered video
+  must be 60 FPS compatible and no longer than 120 seconds.
+required_labels:
+  - ManimBench v2
+  - Basic Manim control
+  - Calculus
+  - Linear algebra
+  - Geometry
+  - Probability
+  - Advanced reasoning
+  - Main equation or theorem for each section
+  - Axes, vectors, regions, variables, and transformations where shown
+required_visuals:
+  - One cohesive final video
+  - Section titles or clear section transitions
+  - At least one function graph on labeled axes
+  - At least one derivative or integral visual
+  - At least one vector or matrix transformation visual
+  - At least one precise geometric diagram
+  - At least one probability or statistics visual
+  - At least one advanced mathematical concept visual
+  - Readable labels that do not overlap or become squished
+automated_checks:
+  required_scene_class: MainScene
+  min_required_labels: 7
+  fps: 60
+  max_duration_seconds: 120
+rubric:
+  mathematical_correctness: >
+    The mathematical visuals, equations, diagrams, and explanations are correct.
+  visual_quality: >
+    Text is readable, labels do not collide, geometry is positioned correctly,
+    and the video communicates clearly.
+  manim_idiom: >
+    The solution uses ManimCE objects and animation patterns directly instead
+    of fake screenshots, hidden hardcoded artifacts, or superficial placeholders.
+  breadth: >
+    The video demonstrates multiple mathematical areas and Manim capabilities
+    within one coherent submission.
+  shareability: >
+    The final MP4 works as a concise public-facing benchmark video under two
+    minutes.
+  usage_accounting: >
+    The benchmark run must include usage.json with elapsed time, prompt tokens,
+    output tokens, total tokens, and estimated USD cost.

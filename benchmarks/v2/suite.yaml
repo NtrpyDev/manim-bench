@@ -1,0 +1,29 @@
+id: manimbench-v2-composite
+version: "2.0.0"
+title: ManimBench v2 Composite Suite
+description: >
+  Composite benchmark suite for evaluating whether a model can create one
+  shareable ManimCE animation that demonstrates broad mathematical reasoning,
+  visual clarity, and robust scene construction under a two minute limit.
+runtime:
+  manim: community
+  fps: 60
+  max_duration_seconds: 120
+  scene_class: MainScene
+policy:
+  official_backend: container
+  local_backend: development_only
+  output_shape: one_final_mp4_per_model
+  required_output_file: outputs/submission.py
+  usage_tracking:
+    required: true
+    files:
+      - usage.json
+    metrics:
+      - elapsed_seconds
+      - input_tokens
+      - output_tokens
+      - total_tokens
+      - estimated_usd
+tasks:
+  - tasks/submission.yaml

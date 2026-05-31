@@ -1,0 +1,216 @@
+defaults:
+  version: "1.0"
+  difficulty: hard
+  runtime_limit_seconds: 120
+  automated_checks:
+    forbidden_imports: [requests, socket, urllib, subprocess, pathlib.Path.home]
+    required_scene_class: MainScene
+    max_duration_seconds: 120
+    fps: 60
+tasks:
+  - id: hard_complex_mapping_z_squared
+    domains: [complex_analysis, geometry, transformations]
+    title: Complex Mapping z Squared
+    prompt: >
+      Explain f(z)=z^2 using domain and codomain planes. Animate z=r e^{i theta}
+      mapping to z^2=r^2 e^{i2theta}, transform rays or circles, and label
+      modulus, argument, doubled angle, squared radius, branch behavior, and a
+      concrete point example.
+    required_labels:
+      - f(z)=z^2
+      - z=r e^{i theta}
+      - z^2=r^2 e^{i2theta}
+      - modulus
+      - argument
+      - doubled angle
+      - squared radius
+      - domain
+      - codomain
+    required_visuals: [domain plane, codomain plane, transformed rays or circles, mapped point]
+    rubric:
+      math_correctness: Polar mapping interpretation is correct.
+      visual_clarity: Domain and codomain are easy to compare.
+      animation_quality: Geometry and algebra reinforce each other.
+
+  - id: hard_gradient_descent_convex_surface
+    domains: [optimization, multivariable_calculus, numerical_methods]
+    title: Gradient Descent On A Convex Surface
+    prompt: >
+      Explain gradient descent on f(x,y)=x^2+2y^2. Show a surface or contour
+      plot, negative gradient arrows, update rule, learning rate, iterates,
+      decreasing objective values, and convergence to the minimum.
+    required_labels:
+      - f(x,y)=x^2+2y^2
+      - gradient
+      - negative gradient
+      - learning rate
+      - update rule
+      - iterate
+      - minimum
+      - convergence
+    required_visuals: [surface or contour plot, descent path, update arrows, objective values]
+    rubric:
+      math_correctness: Gradient and updates are correct.
+      visual_clarity: Path and minimum are labeled.
+      animation_quality: Descent is visibly monotonic or explained if not.
+
+  - id: hard_stokes_theorem_surface_boundary
+    domains: [multivariable_calculus, vector_calculus, 3d]
+    title: Stokes Theorem Surface And Boundary
+    prompt: >
+      Visualize Stokes theorem by showing an oriented surface, its boundary
+      curve, a vector field, curl vectors on the surface, and circulation around
+      the boundary. Label orientation, normal vector, boundary, curl, line
+      integral, surface integral, and the theorem statement.
+    required_labels: [Stokes theorem, orientation, normal vector, boundary, curl, line integral, surface integral]
+    required_visuals: [3D surface, boundary curve, vector field, curl arrows, circulation arrows]
+    rubric:
+      math_correctness: Orientation and integral relationship are correct.
+      visual_clarity: Surface, boundary, and vectors are labeled.
+      animation_quality: Boundary circulation links to curl over surface.
+
+  - id: hard_laplace_transform_ode
+    domains: [differential_equations, transforms]
+    title: Solving An ODE With Laplace Transform
+    prompt: >
+      Solve y' + 2y = e^{-t}, y(0)=1 using the Laplace transform. Animate the
+      time-domain equation moving to the s-domain, algebraic solution, inverse
+      transform, and final y(t). Label every transform step and plot the result.
+    required_labels:
+      - y' + 2y = e^{-t}
+      - y(0)=1
+      - Laplace transform
+      - s-domain
+      - inverse transform
+      - y(t)
+      - solution
+    required_visuals: [equation pipeline, algebra steps, solution plot]
+    rubric:
+      math_correctness: Transform algebra and solution are correct.
+      visual_clarity: Equation flow is readable.
+      animation_quality: Domain transition is visually meaningful.
+
+  - id: hard_central_limit_theorem_sampling
+    domains: [probability, statistics]
+    title: Central Limit Theorem From Samples
+    prompt: >
+      Explain the central limit theorem by sampling from a skewed distribution,
+      forming sample means for increasing sample sizes, and showing the sampling
+      distribution becoming approximately normal. Label population distribution,
+      sample mean, n, variance shrinkage, normal approximation, and CLT.
+    required_labels: [population distribution, sample mean, n, variance shrinkage, normal approximation, central limit theorem]
+    required_visuals: [source distribution, sample groups, histograms of means, normal curve]
+    rubric:
+      math_correctness: CLT behavior is represented accurately.
+      visual_clarity: Histograms and labels are readable.
+      animation_quality: Increasing n changes distribution clearly.
+
+  - id: hard_rsa_modular_exponentiation
+    domains: [number_theory, cryptography]
+    title: RSA Encryption Toy Example
+    prompt: >
+      Present a small RSA toy example using p=5, q=11, n=55, phi(n)=40,
+      public exponent e=3, and private exponent d=27. Animate key generation,
+      encryption m^e mod n, decryption c^d mod n, and label all modular steps.
+    required_labels: [p=5, q=11, n=55, phi(n)=40, e=3, d=27, encryption, decryption, mod n]
+    required_visuals: [key generation flow, modular exponentiation, message to ciphertext to message]
+    rubric:
+      math_correctness: RSA arithmetic is internally consistent.
+      visual_clarity: Public/private key roles are labeled.
+      animation_quality: Modular arithmetic is shown, not only asserted.
+
+  - id: hard_group_action_square_symmetry
+    domains: [abstract_algebra, geometry]
+    title: Dihedral Group Acting On A Square
+    prompt: >
+      Visualize the dihedral group D4 acting on a labeled square. Animate
+      rotations and reflections, label group elements, orbit, stabilizer, Cayley
+      table or composition examples, and explain non-commutativity with two
+      different operation orders.
+    required_labels: [D4, rotation, reflection, orbit, stabilizer, composition, non-commutative]
+    required_visuals: [labeled square, rotations, reflections, operation order comparison]
+    rubric:
+      math_correctness: D4 actions and non-commutativity are correct.
+      visual_clarity: Vertex labels track transformations.
+      animation_quality: Operation composition is easy to compare.
+
+  - id: hard_topology_torus_cycles
+    domains: [topology, geometry, 3d]
+    title: Torus Fundamental Cycles
+    prompt: >
+      Show a torus with two non-contractible cycles: meridian and longitude.
+      Contrast them with a contractible loop. Label homotopy, fundamental
+      cycles, meridian, longitude, contractible loop, and why the two main loops
+      cannot shrink to a point on the torus.
+    required_labels: [torus, meridian, longitude, contractible loop, homotopy, fundamental cycle, cannot shrink]
+    required_visuals: [3D torus or projected torus, colored loops, shrink comparison]
+    rubric:
+      math_correctness: Contractible vs non-contractible loops are accurate.
+      visual_clarity: Loops are labeled and distinguishable.
+      animation_quality: Shrink/no-shrink contrast is clear.
+
+  - id: hard_fourier_square_wave_gibbs
+    domains: [fourier_analysis, real_analysis]
+    title: Fourier Series And Gibbs Phenomenon
+    prompt: >
+      Animate partial Fourier sums approximating a square wave. Label harmonic
+      terms, coefficients, partial sum S_N, discontinuity, overshoot, Gibbs
+      phenomenon, and show why increasing N sharpens but does not remove the
+      overshoot.
+    required_labels: [square wave, harmonic, coefficient, partial sum S_N, discontinuity, overshoot, Gibbs phenomenon]
+    required_visuals: [target wave, multiple partial sums, highlighted overshoot]
+    rubric:
+      math_correctness: Series behavior and Gibbs overshoot are correct.
+      visual_clarity: Partial sums and discontinuity are labeled.
+      animation_quality: Increasing N is animated coherently.
+
+  - id: hard_runge_kutta_phase_plane
+    domains: [differential_equations, numerical_methods, dynamical_systems]
+    title: Runge Kutta Method In A Phase Plane
+    prompt: >
+      Explain RK4 on the system x'=y, y'=-x. Show the phase plane, circular
+      true trajectory, RK4 intermediate slopes k1 through k4, step update, and
+      compare Euler drift with RK4 accuracy.
+    required_labels: [x'=y, y'=-x, phase plane, k1, k2, k3, k4, RK4 update, Euler drift, accuracy]
+    required_visuals: [phase plane, trajectory, slope samples, Euler vs RK4 paths]
+    rubric:
+      math_correctness: RK4 slope stages are conceptually correct.
+      visual_clarity: Numerical paths are distinguishable.
+      animation_quality: Intermediate slopes support the update.
+
+  - id: hard_information_entropy_kl
+    domains: [information_theory, probability]
+    title: Entropy And KL Divergence
+    prompt: >
+      Compare two discrete distributions P and Q. Animate entropy H(P),
+      cross-entropy H(P,Q), and KL divergence D_KL(P||Q). Label probability
+      bars, surprise -log p, expected code length, mismatch penalty, and
+      non-negativity.
+    required_labels: [P, Q, entropy H(P), cross-entropy, KL divergence, -log p, expected code length, non-negativity]
+    required_visuals: [probability bars, code length annotations, divergence comparison]
+    rubric:
+      math_correctness: Entropy/KL relationships are correct.
+      visual_clarity: Distributions and quantities are readable.
+      animation_quality: Mismatch penalty is visually explained.
+
+  - id: hard_lagrange_multipliers_constraint
+    domains: [optimization, multivariable_calculus]
+    title: Lagrange Multipliers With A Constraint
+    prompt: >
+      Maximize f(x,y)=xy subject to x^2+y^2=1. Show level curves, the constraint
+      circle, tangent point, gradients becoming parallel, equation grad f =
+      lambda grad g, candidate points, and final maximum/minimum labels.
+    required_labels:
+      - f(x,y)=xy
+      - x^2+y^2=1
+      - level curve
+      - constraint
+      - tangent point
+      - grad f = lambda grad g
+      - maximum
+      - minimum
+    required_visuals: [level curves, constraint circle, gradient arrows, candidate points]
+    rubric:
+      math_correctness: Candidate points and gradient condition are correct.
+      visual_clarity: Constraint and level curves are labeled.
+      animation_quality: Tangency condition is visually motivated.

@@ -1,0 +1,36 @@
+id: hard_complex_mapping
+version: "1.0"
+difficulty: hard
+domains: [complex_analysis, geometry, transformations]
+title: Complex Mapping z Squared
+runtime_limit_seconds: 120
+prompt: >
+  Create a ManimCE animation explaining the complex map f(z) = z^2. Show a
+  labeled complex plane domain and codomain, animate how a polar point
+  z = r e^{i theta} maps to z^2 = r^2 e^{i 2 theta}, and show a grid or set of
+  rays/circles being transformed. Label modulus, argument, doubled angle,
+  squared radius, branch behavior, and at least one concrete example point.
+required_labels:
+  - f(z) = z^2
+  - z = r e^{i theta}
+  - z^2 = r^2 e^{i 2 theta}
+  - modulus
+  - argument
+  - doubled angle
+  - squared radius
+  - domain
+  - codomain
+required_visuals:
+  - domain complex plane
+  - codomain complex plane
+  - transformed rays or circles
+  - concrete mapped point
+automated_checks:
+  forbidden_imports: [requests, socket, urllib, subprocess, pathlib.Path.home]
+  required_scene_class: MainScene
+  max_duration_seconds: 120
+  fps: 60
+rubric:
+  math_correctness: Correct polar interpretation and example mapping.
+  visual_clarity: Domain/codomain, angles, radii, and formulas are labeled.
+  animation_quality: The transformation communicates both geometry and algebra.

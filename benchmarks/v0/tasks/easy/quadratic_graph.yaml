@@ -1,0 +1,31 @@
+id: easy_quadratic_graph
+version: "1.0"
+difficulty: easy
+domains: [algebra, graphing]
+title: Fully Labeled Quadratic Graph
+runtime_limit_seconds: 120
+prompt: >
+  Create a ManimCE animation that plots y = x^2 - 4x + 3 on coordinate axes.
+  Label the axes, equation, graph, vertex, x-intercepts, y-intercept, and axis
+  of symmetry. Animate how the vertex form y = (x - 2)^2 - 1 explains the graph.
+required_labels:
+  - y = x^2 - 4x + 3
+  - y = (x - 2)^2 - 1
+  - vertex
+  - x-intercepts
+  - y-intercept
+  - axis of symmetry
+required_visuals:
+  - coordinate axes
+  - quadratic graph
+  - intercept markers
+  - vertex marker
+automated_checks:
+  forbidden_imports: [requests, socket, urllib, subprocess, pathlib.Path.home]
+  required_scene_class: MainScene
+  max_duration_seconds: 120
+  fps: 60
+rubric:
+  math_correctness: Correct vertex, intercepts, and vertex-form explanation.
+  visual_clarity: Axes, points, graph, and equations remain legible.
+  animation_quality: The transition from standard form to vertex form supports the explanation.

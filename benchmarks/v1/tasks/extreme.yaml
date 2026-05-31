@@ -1,0 +1,173 @@
+defaults:
+  version: "1.0"
+  difficulty: extreme
+  runtime_limit_seconds: 120
+  automated_checks:
+    forbidden_imports: [requests, socket, urllib, subprocess, pathlib.Path.home]
+    required_scene_class: MainScene
+    max_duration_seconds: 120
+    fps: 60
+tasks:
+  - id: extreme_fourier_heat_equation_modes
+    domains: [differential_equations, fourier_analysis, mathematical_physics]
+    title: Fourier Modes Solving The Heat Equation
+    prompt: >
+      Explain how Fourier sine modes solve u_t = alpha u_xx on 0 <= x <= L
+      with zero boundary conditions. Show separation of variables, eigenmodes,
+      Fourier coefficients, exponential decay, initial condition decomposition,
+      and recombination as heat diffuses.
+    required_labels:
+      - u_t = alpha u_xx
+      - u(0,t)=u(L,t)=0
+      - separation of variables
+      - sine eigenmodes
+      - Fourier coefficients
+      - exponential decay
+      - initial condition
+      - heat diffusion
+    required_visuals: [PDE, boundary conditions, mode decomposition, time evolution, recombined solution]
+    rubric:
+      math_correctness: Separation, eigenmodes, and decay are correct.
+      visual_clarity: Derivation and animation remain connected.
+      animation_quality: Mode decay explains diffusion.
+
+  - id: extreme_cauchy_integral_theorem
+    domains: [complex_analysis, topology]
+    title: Cauchy Integral Theorem And Deforming Contours
+    prompt: >
+      Visualize Cauchy's integral theorem for a holomorphic function on a simply
+      connected region. Animate contour deformation, label holomorphic region,
+      singularity-free domain, closed contour, integral, homotopy, and explain
+      why the contour integral is zero. Contrast with a contour enclosing a pole.
+    required_labels: [Cauchy integral theorem, holomorphic, simply connected, closed contour, integral zero, homotopy, pole, singularity]
+    required_visuals: [complex plane region, deforming contour, singularity contrast]
+    rubric:
+      math_correctness: Conditions and pole contrast are correct.
+      visual_clarity: Region, contour, and singularity labels are clear.
+      animation_quality: Deformation conveys the theorem.
+
+  - id: extreme_noether_symmetry_conservation
+    domains: [mathematical_physics, variational_calculus]
+    title: Noether Symmetry To Conservation Law
+    prompt: >
+      Give a visual proof sketch of Noether's theorem for time-translation
+      symmetry. Show action, Lagrangian, symmetry transformation, invariant
+      action, conserved energy, and a physical trajectory with energy remaining
+      constant.
+    required_labels: [Noether theorem, action, Lagrangian, time-translation symmetry, invariant action, conserved energy, trajectory]
+    required_visuals: [equation flow, symmetry transformation, physical trajectory, conserved quantity indicator]
+    rubric:
+      math_correctness: Symmetry-conservation relationship is accurately sketched.
+      visual_clarity: Abstract equations are visually organized.
+      animation_quality: Physical example grounds the theorem.
+
+  - id: extreme_spectral_graph_laplacian
+    domains: [graph_theory, linear_algebra, spectral_methods]
+    title: Spectral Graph Laplacian And Clustering
+    prompt: >
+      Explain spectral clustering using the graph Laplacian. Show a weighted
+      graph, adjacency matrix, degree matrix, L = D - A, eigenvectors, Fiedler
+      vector, node embedding on a line, and the resulting partition.
+    required_labels: [adjacency matrix, degree matrix, L = D - A, eigenvector, Fiedler vector, embedding, partition, spectral clustering]
+    required_visuals: [weighted graph, matrices, eigenvector values, partitioned graph]
+    rubric:
+      math_correctness: Laplacian and Fiedler-vector clustering are correct.
+      visual_clarity: Matrix and graph views are linked.
+      animation_quality: Embedding explains the cut.
+
+  - id: extreme_manifold_geodesic_curvature
+    domains: [differential_geometry, topology, 3d]
+    title: Geodesics And Curvature On A Surface
+    prompt: >
+      Visualize geodesics on a curved surface such as a sphere or saddle.
+      Contrast intrinsic straightness with extrinsic curvature. Label tangent
+      plane, normal vector, geodesic, curvature, parallel transport, and local
+      coordinates.
+    required_labels: [geodesic, tangent plane, normal vector, curvature, parallel transport, local coordinates, intrinsic, extrinsic]
+    required_visuals: [curved surface, geodesic curve, tangent plane, transported vector]
+    rubric:
+      math_correctness: Intrinsic/extrinsic distinction is accurate.
+      visual_clarity: 3D objects and labels remain legible.
+      animation_quality: Motion along surface conveys geodesic idea.
+
+  - id: extreme_galois_group_quartic_symmetry
+    domains: [abstract_algebra, field_theory]
+    title: Galois Group As Root Symmetry
+    prompt: >
+      Explain the idea of a Galois group through root symmetries of a polynomial.
+      Use a concrete polynomial with four roots, animate permutations preserving
+      algebraic relations, and label field extension, automorphism, root
+      permutation, invariant relation, and solvability intuition.
+    required_labels: [Galois group, polynomial roots, field extension, automorphism, permutation, invariant relation, solvability]
+    required_visuals: [root diagram, permutation arrows, relation constraints]
+    rubric:
+      math_correctness: Root symmetry and automorphism idea are not misleading.
+      visual_clarity: Abstract labels are tied to visual objects.
+      animation_quality: Permutations demonstrate invariance.
+
+  - id: extreme_persistent_homology_filtration
+    domains: [topology, data_analysis]
+    title: Persistent Homology Filtration
+    prompt: >
+      Animate a point cloud growing balls with radius epsilon, forming connected
+      components and loops. Show a filtration, barcode, birth, death, connected
+      components H0, loop H1, persistence, and noise versus signal.
+    required_labels: [point cloud, epsilon, filtration, barcode, birth, death, H0, H1, persistence, noise, signal]
+    required_visuals: [point cloud, growing balls, loop formation, barcode chart]
+    rubric:
+      math_correctness: Birth/death and persistence ideas are correct.
+      visual_clarity: Filtration and barcode are synchronized.
+      animation_quality: Topological features appear and disappear clearly.
+
+  - id: extreme_ito_lemma_brownian_motion
+    domains: [stochastic_calculus, probability]
+    title: Ito Lemma From Brownian Motion
+    prompt: >
+      Give a visual explanation of Ito's lemma for dX_t = mu dt + sigma dW_t.
+      Show a Brownian-like path, small increments, quadratic variation,
+      Taylor expansion with the second-order term, and the final Ito correction.
+    required_labels: [Ito lemma, Brownian motion, dX_t, mu dt, sigma dW_t, quadratic variation, Taylor expansion, Ito correction]
+    required_visuals: [random-looking path, increments, expansion terms, correction highlight]
+    rubric:
+      math_correctness: Ito correction and quadratic variation are explained accurately.
+      visual_clarity: Stochastic notation is readable.
+      animation_quality: Increment view motivates the formula.
+
+  - id: extreme_wave_equation_eigenmodes
+    domains: [partial_differential_equations, fourier_analysis, mathematical_physics]
+    title: Wave Equation Normal Modes
+    prompt: >
+      Explain u_tt = c^2 u_xx on a fixed string. Show boundary conditions,
+      normal modes, superposition, energy exchange between kinetic and potential
+      forms, and animate how an initial displacement decomposes into modes.
+    required_labels: [u_tt = c^2 u_xx, fixed boundary, normal mode, superposition, kinetic energy, potential energy, initial displacement]
+    required_visuals: [string, standing waves, mode decomposition, energy indicators]
+    rubric:
+      math_correctness: Modes and superposition are correct.
+      visual_clarity: Energy and mode labels are distinct.
+      animation_quality: Motion communicates wave dynamics.
+
+  - id: extreme_category_adjoint_functors
+    domains: [category_theory, abstract_algebra]
+    title: Adjoint Functors As Universal Translation
+    prompt: >
+      Visually explain an adjunction F ⊣ G using two categories, objects,
+      morphisms, hom-set correspondence Hom(F A, B) ≅ Hom(A, G B), unit,
+      counit, and a concrete free-forgetful example. Every object, morphism,
+      natural transformation, and correspondence must be labeled.
+    required_labels:
+      - F ⊣ G
+      - category
+      - object
+      - morphism
+      - Hom(F A, B)
+      - Hom(A, G B)
+      - unit
+      - counit
+      - free functor
+      - forgetful functor
+    required_visuals: [two category diagrams, functor arrows, hom-set correspondence, unit/counit arrows]
+    rubric:
+      math_correctness: Adjunction correspondence and example are coherent.
+      visual_clarity: Abstract diagrams are not cluttered.
+      animation_quality: Correspondence is revealed in a learnable sequence.
