@@ -1,0 +1,48 @@
+id: probability_distribution
+version: "0.4.0"
+difficulty: focused
+domains:
+  - probability
+  - statistics
+title: Probability Distribution Visualization
+runtime_limit_seconds: 120
+prompt: |
+  Create a ManimCE animation explaining the probability distribution for the sum
+  of two fair dice.
+
+  Requirements:
+  - Show a bar chart for sums 2 through 12 with counts 1,2,3,4,5,6,5,4,3,2,1.
+  - Label probabilities as count / 36 and highlight sum 7.
+  - Include at least two sample dice outcomes that connect to chart bars.
+  - Display P(sum = 7) = 6/36 = 1/6.
+  - Keep all bar labels readable and not crowded.
+required_labels:
+  - Probability
+  - two fair dice
+  - sum
+  - count
+  - count / 36
+  - P(sum = 7) = 6/36 = 1/6
+  - most likely
+  - 7
+required_visuals:
+  - bar chart
+  - dice outcome examples
+  - highlighted sum 7
+  - probability equation
+automated_checks:
+  required_scene_class: MainScene
+  forbidden_imports: [requests, socket, urllib, subprocess, pathlib.Path.home]
+  min_required_labels: 6
+  fps: 60
+  max_duration_seconds: 120
+  required_source_terms:
+    - BarChart
+    - MathTex
+    - Text
+    - Rectangle
+    - VGroup
+rubric:
+  mathematical_correctness: Counts and probabilities match two fair dice.
+  visual_clarity: Bar labels and highlighted outcome remain readable.
+  animation_quality: Sample outcomes connect to the distribution.

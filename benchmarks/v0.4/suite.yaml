@@ -1,0 +1,35 @@
+id: manimbench-v0.4-public
+version: "0.4.0"
+title: ManimBench V0.4 Public Suite
+description: >
+  Six-task public benchmark suite for evaluating ManimCE coding ability,
+  mathematical explanation, layout discipline, and obvious visual failures.
+runtime:
+  manim: community
+  fps: 60
+  max_duration_seconds: 120
+  scene_class: MainScene
+policy:
+  official_backend: container
+  local_backend: development_only
+  output_shape: one_python_file_per_task
+  required_output_pattern: outputs/<task_id>.py
+  visual_sanity_checks: required
+  layout_probe: best_effort
+  usage_tracking:
+    required: true
+    files:
+      - usage.json
+    metrics:
+      - elapsed_seconds
+      - input_tokens
+      - output_tokens
+      - total_tokens
+      - estimated_usd
+tasks:
+  - tasks/basic_manim_layout.yaml
+  - tasks/calculus_derivative_graph.yaml
+  - tasks/linear_algebra_transformation.yaml
+  - tasks/geometry_measurement_diagram.yaml
+  - tasks/probability_distribution.yaml
+  - tasks/advanced_math_explanation.yaml

@@ -1,0 +1,54 @@
+id: basic_manim_layout
+version: "0.4.0"
+difficulty: focused
+domains:
+  - manim_basics
+  - layout
+title: Basic Manim Control And Layout
+runtime_limit_seconds: 120
+prompt: |
+  Create a concise Manim Community Edition animation that demonstrates basic
+  Manim control and clean layout.
+
+  Requirements:
+  - Define exactly one primary scene class named MainScene.
+  - Use at least Circle, Square, Triangle, Arrow, Text, MathTex, VGroup, and a
+    visible transform between two objects.
+  - Arrange objects in a deliberate layout with readable labels and a small
+    timeline or step indicator.
+  - Include a quantitative label such as scale factor, coordinate, or duration.
+  - Avoid overlapping labels, edge-clipped objects, placeholder text, static
+    screenshots, and decorative filler.
+required_labels:
+  - Basic Manim control
+  - Circle
+  - Square
+  - Triangle
+  - Arrow
+  - Transform
+  - timeline
+  - scale
+required_visuals:
+  - labeled geometric objects
+  - visible transform
+  - timeline or step indicator
+  - clean non-overlapping layout
+automated_checks:
+  required_scene_class: MainScene
+  forbidden_imports: [requests, socket, urllib, subprocess, pathlib.Path.home]
+  min_required_labels: 6
+  fps: 60
+  max_duration_seconds: 120
+  required_source_terms:
+    - Circle
+    - Square
+    - Triangle
+    - Arrow
+    - Text
+    - MathTex
+    - VGroup
+    - Transform
+rubric:
+  visual_clarity: Labels and objects are readable, aligned, and not clipped.
+  manim_idiom: Uses Manim mobjects and animation primitives directly.
+  animation_quality: The transform and timeline are easy to follow.

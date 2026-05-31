@@ -1,0 +1,49 @@
+id: advanced_math_explanation
+version: "0.4.0"
+difficulty: focused
+domains:
+  - advanced_mathematics
+  - differential_equations
+  - fourier_analysis
+title: Advanced Math Explanation
+runtime_limit_seconds: 120
+prompt: |
+  Create a ManimCE animation explaining Fourier heat equation intuition.
+
+  Requirements:
+  - Show a one-dimensional temperature profile u(x, t) changing over time.
+  - Decompose the profile into at least two labeled sine modes.
+  - Display u_t = alpha u_xx and a short equation showing mode decay.
+  - Label initial profile, mode 1, mode 2, heat diffusion, and smoother final
+    profile.
+  - Use graphs/equations rather than screenshots or external assets.
+required_labels:
+  - Advanced math
+  - heat equation
+  - u_t = alpha u_xx
+  - Fourier mode
+  - mode 1
+  - mode 2
+  - decay
+  - diffusion
+required_visuals:
+  - changing temperature profile
+  - at least two sine modes
+  - heat equation
+  - decay explanation
+automated_checks:
+  required_scene_class: MainScene
+  forbidden_imports: [requests, socket, urllib, subprocess, pathlib.Path.home]
+  min_required_labels: 6
+  fps: 60
+  max_duration_seconds: 120
+  required_source_terms:
+    - Axes
+    - plot
+    - MathTex
+    - Text
+    - Transform
+rubric:
+  mathematical_correctness: Fourier modes and decay match heat equation intuition.
+  visual_clarity: Graphs and equations are legible and separated.
+  animation_quality: The profile visibly smooths or modes visibly decay.
