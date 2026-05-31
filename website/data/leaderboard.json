@@ -1,0 +1,21 @@
+{
+  "schema_version": "0.4.0",
+  "status": "pending_first_run",
+  "run_id": null,
+  "updated_at": null,
+  "suite": {
+    "id": "manimbench-v0.4-public",
+    "version": "0.4.0",
+    "title": "ManimBench V0.4 Public Suite",
+    "task_count": 6,
+    "task_ids": [
+      "basic_manim_layout",
+      "calculus_derivative_graph",
+      "linear_algebra_transformation",
+      "geometry_measurement_diagram",
+      "probability_distribution",
+      "advanced_math_explanation"
+    ]
+  },
+  "models": []
+}
