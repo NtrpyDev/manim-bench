@@ -1,0 +1,10 @@
+id: example-model
+display_name: Example Model
+provider: file
+notes: >
+  File-provider outputs are read from a directory containing one Python file per
+  task, named <task_id>.py.
+metadata_fields:
+  - cost_usd
+  - elapsed_seconds
+  - output_tokens
