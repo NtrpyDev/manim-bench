@@ -1,0 +1,38 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "manimbench"
+version = "0.1.0"
+description = "A sandboxed benchmark for evaluating AI models on Manim Community Edition animation generation and mathematical visualization."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [
+  { name = "ManimBench Contributors" }
+]
+dependencies = [
+  "PyYAML>=6.0.2",
+  "Pillow>=10.0",
+  "numpy>=1.26",
+  "opencv-python-headless>=4.9"
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0"
+]
+render = [
+  "manim>=0.20,<0.21"
+]
+
+[project.scripts]
+manimbench = "manimbench.cli:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/manimbench"]
