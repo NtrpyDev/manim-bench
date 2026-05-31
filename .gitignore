@@ -1,0 +1,44 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.venv/
+.env
+.cache/
+.cursor/
+.claude/
+.agents/
+.impeccable/
+
+# Generated benchmark artifacts.
+runs/
+reports/
+site/
+usage/
+share/
+sample_outputs/**/media/
+sample_outputs/**/logs/
+
+# Local Manim caches/media.
+media/
+.manim/
+.manimbench/
+partial_movie_files/
+
+# Generated model workspaces and outputs.
+model_tests/
+model_outputs/
+outputs/
+
+# Site build output (deploy bundle).
+website/dist/
+website/.wrangler/
+website/*.zip
+
+# Media artifacts.
+*.mp4
+*.webm
+*.mov
+*.avi
+*.mkv
