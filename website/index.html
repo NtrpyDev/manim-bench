@@ -14,7 +14,7 @@
       href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Serif:ital,wght@0,400;0,500;0,600;1,400&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="assets/css/style.css?v=20260531-docs-methodology" />
+    <link rel="stylesheet" href="assets/css/style.css?v=20260601-hero-lede-tint-fix" />
   </head>
   <body>
     <div class="notice-bar">
@@ -25,34 +25,41 @@
 
     <header class="site-header header-stripe">
       <div class="header-inner">
-        <a class="brand" href="#top">ManimBench</a>
-        <nav class="site-nav nav-even">
-          <a href="#rankings">Leaderboard</a>
-          <a href="#methodology">Methodology</a>
-          <a href="#documentation">Documentation</a>
+        <a class="brand" href="index.html">ManimBench</a>
+        <nav class="site-nav nav-even" aria-label="Primary">
+          <a href="index.html#rankings" aria-current="page">Leaderboard</a>
+          <a href="methodology.html">Methodology</a>
+          <a href="docs.html">Docs</a>
+          <a href="blog/index.html">Blog</a>
+          <a href="faq.html">FAQ</a>
           <a href="https://github.com/NtrpyDev/manim-bench" class="nav-ghost" target="_blank" rel="noopener">GitHub</a>
         </nav>
       </div>
     </header>
 
     <main id="top">
-      <section class="hero hero-compact hero-band hero-nav-fill">
-        <dl class="hero-stats">
+
+      <section class="hero hero-compact hero-band hero-nav-fill hero-bold-scale">
+        <dl class="hero-lay-stats hero-stats-tint">
           <div><dt>Suite</dt><dd id="header-suite-label">V0.4 public</dd></div>
           <div><dt>Models</dt><dd id="header-model-count">0</dd></div>
           <div><dt>Updated</dt><dd id="header-updated-at">Not yet</dd></div>
           <div><dt>Top score</dt><dd id="hero-top-score">n/a</dd></div>
         </dl>
-        <p class="hero-lede">Six focused ManimCE tasks under sandboxed execution. Scores combine source checks, render metadata, visual sanity checks, cost, runtime, and tokens.</p>
-        <div class="hero-actions">
-          <div class="btn-group">
-            <a href="#rankings" class="btn btn-primary">Leaderboard</a>
-            <a href="#documentation" class="btn btn-secondary">Documentation</a>
-          </div>
-          <a href="#run" class="btn btn-run">Run V0.4</a>
+        <div class="hero-lay-lede hero-lede-bold-rule">
+          <p class="hero-lede-intro">Six focused ManimCE tasks<br />under sandboxed execution</p>
+          <ul class="hero-lede-measures">
+            <li>Source checks</li>
+            <li>Render metadata</li>
+            <li>Visual sanity checks</li>
+            <li>Cost accounting</li>
+            <li>Runtime</li>
+            <li>Output tokens</li>
+          </ul>
         </div>
         <span class="sr-only"><span id="suite-label">V0.4 public</span><span id="model-count">0</span><span id="updated-at">Not yet</span></span>
       </section>
+
 
       <section id="rankings" class="data-section">
         <div class="section-head">
@@ -95,72 +102,10 @@
         </div>
       </section>
 
-      <section id="methodology" class="prose-section methodology-section">
-        <div class="prose-heading">
-          <h2>Methodology</h2>
-          <p class="section-lede">One shared prompt, six focused submissions, identical sandbox. V0.4 scores model behavior that is hard to fake with source keywords alone.</p>
-        </div>
-        <div class="methodology-grid">
-          <article class="methodology-item">
-            <h3>Task Coverage</h3>
-            <p>Each model solves six separate ManimCE tasks: layout basics, derivative graphing, matrix transformation, measured geometry, dice probabilities, and Fourier heat equation intuition.</p>
-          </article>
-          <article class="methodology-item">
-            <h3>Output Contract</h3>
-            <p>Every task maps to one file named <code>outputs/&lt;task_id&gt;.py</code>. Each file must import ManimCE and define a primary scene class named <code>MainScene</code>.</p>
-          </article>
-          <article class="methodology-item">
-            <h3>Sandbox Render</h3>
-            <p>Official runs use the container backend with network disabled, resource limits, 60 FPS rendering, and a 120 second per-task runtime cap.</p>
-          </article>
-          <article class="methodology-item">
-            <h3>Source Checks</h3>
-            <p>The scorer parses Python with AST checks. Comments and unused strings do not satisfy required constructs, and placeholder scenes are capped even when they render.</p>
-          </article>
-          <article class="methodology-item">
-            <h3>Visual Sanity</h3>
-            <p>Rendered frames are sampled for blank output, foreground clutter, edge clipping, low contrast, and dense regions that often indicate label collisions.</p>
-          </article>
-          <article class="methodology-item">
-            <h3>Usage Accounting</h3>
-            <p>Reports include generation time, input tokens, output tokens, total tokens, and estimated USD cost from the configured model registry.</p>
-          </article>
-        </div>
-      </section>
+
 
       <div class="split-sections">
-        <section id="documentation" class="prose-section documentation-section">
-          <h2>Documentation</h2>
-          <p class="section-lede">The benchmark is reproducible from the repository. These are the source documents for running, scoring, reviewing, and publishing results.</p>
-          <div class="documentation-links">
-            <a href="https://github.com/NtrpyDev/manim-bench#quickstart" target="_blank" rel="noopener">
-              <strong>Quickstart</strong>
-              <span>Install the package, prepare V0.4 outputs, and run the guided launcher.</span>
-            </a>
-            <a href="https://github.com/NtrpyDev/manim-bench/blob/main/docs/public-suite.md" target="_blank" rel="noopener">
-              <strong>Public suite</strong>
-              <span>Read the V0.4 task coverage and official result policy.</span>
-            </a>
-            <a href="https://github.com/NtrpyDev/manim-bench/blob/main/docs/scoring.md" target="_blank" rel="noopener">
-              <strong>Scoring</strong>
-              <span>See how source checks, render checks, visual sanity checks, and review fit together.</span>
-            </a>
-            <a href="https://github.com/NtrpyDev/manim-bench/blob/main/docs/model-workspaces.md" target="_blank" rel="noopener">
-              <strong>Model workspaces</strong>
-              <span>Create file-backed workspaces for any AI coding agent.</span>
-            </a>
-            <a href="https://github.com/NtrpyDev/manim-bench/blob/main/docs/run-comparison.md" target="_blank" rel="noopener">
-              <strong>Run comparison</strong>
-              <span>Auto-discover ready model outputs and build a comparison report.</span>
-            </a>
-            <a href="https://github.com/NtrpyDev/manim-bench/blob/main/docs/deploy-site.md" target="_blank" rel="noopener">
-              <strong>Publish site</strong>
-              <span>Build and deploy the static report bundle.</span>
-            </a>
-          </div>
-        </section>
-
-        <section id="run" class="prose-section">
+        <section id="run" class="prose-section run-section">
           <h2>Run V0.4</h2>
           <p class="section-lede">V0.4 is file-backed. Generate one ManimCE file per task, place the files in an output folder, then run the launcher.</p>
           <ol class="run-steps">
@@ -169,14 +114,20 @@
             <li><code>python start_benchmark.py</code></li>
             <li>Select the public suite, the model output folder, and the container sandbox for official runs.</li>
           </ol>
-          <blockquote class="run-prompt" aria-label="Output contract">Each output file must define one ManimCE <code>MainScene</code>. The default suite expects <code>basic_manim_layout.py</code>, <code>calculus_derivative_graph.py</code>, <code>linear_algebra_transformation.py</code>, <code>geometry_measurement_diagram.py</code>, <code>probability_distribution.py</code>, and <code>advanced_math_explanation.py</code>.</blockquote>
+          <p class="run-prompt" aria-label="Output contract">Each output file must define one ManimCE <code>MainScene</code>. The default suite expects <code>basic_manim_layout.py</code>, <code>calculus_derivative_graph.py</code>, <code>linear_algebra_transformation.py</code>, <code>geometry_measurement_diagram.py</code>, <code>probability_distribution.py</code>, and <code>advanced_math_explanation.py</code>.</p>
         </section>
       </div>
+
+
     </main>
 
     <footer class="site-footer">
       <p>ManimBench. Open benchmark for mathematical animation with AI.</p>
       <p class="footer-links">
+        <a href="docs.html">Documentation</a>
+        <a href="methodology.html">Methodology</a>
+        <a href="blog/index.html">Blog</a>
+        <a href="faq.html">FAQ</a>
         <a href="https://www.manim.community/" target="_blank" rel="noopener">ManimCE</a>
         <a href="https://github.com/NtrpyDev/manim-bench" target="_blank" rel="noopener">Source</a>
       </p>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Introducing ManimBench | ManimBench</title>
+    <meta name="description" content="ManimBench measures whether AI models can write ManimCE animations that explain math clearly under sandboxed conditions." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Serif:ital,wght@0,400;0,500;0,600;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../assets/css/style.css?v=20260601-nav-colors" />
+  </head>
+  <body>
+    <div class="notice-bar">
+      <span>ManimBench V0.4 public suite</span>
+      <span class="notice-dot" aria-hidden="true"></span>
+      <span>Open benchmark for ManimCE animation quality</span>
+    </div>
+
+    <header class="site-header header-stripe">
+      <div class="header-inner">
+        <a class="brand" href="../index.html">ManimBench</a>
+        <nav class="site-nav nav-even" aria-label="Primary">
+          <a href="../index.html#rankings">Leaderboard</a>
+          <a href="../methodology.html">Methodology</a>
+          <a href="../docs.html">Docs</a>
+          <a href="index.html" aria-current="page">Blog</a>
+          <a href="../faq.html">FAQ</a>
+          <a href="https://github.com/NtrpyDev/manim-bench" class="nav-ghost" target="_blank" rel="noopener">GitHub</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="content-page article-page">
+      <p class="article-back"><a href="index.html">← Blog</a></p>
+      <article>
+        <header class="content-header">
+          <h1>Introducing ManimBench</h1>
+          <p class="article-byline">May 2026 · 8 min read</p>
+        </header>
+
+        <div class="article-body">
+          <p class="article-lede">ManimBench asks whether coding models can write Manim Community Edition animations that explain math clearly, not just code that exits without error.</p>
+
+          <p>A scene can render cleanly and still fail as explanation. Labels overlap. Graphs clip at the frame edge. A model can hardcode the final answer in static text and skip the steps the prompt asked for. ManimBench scores those failures alongside render success.</p>
+
+          <h2>Why Manim</h2>
+
+          <p>Most coding benchmarks test symbols or unit tests. ManimCE requires layout, timing, labeling, and coordinate systems. A model has to build a scene graph and animate objects a viewer can follow.</p>
+
+          <p>ManimCE is widely used and maintained. It is expressive enough to be hard to fake with a static image or a block of LaTeX alone.</p>
+
+          <h2>What gets measured</h2>
+
+          <p>Each model gets the same six public tasks. Every task is one Python file with a single <code>MainScene</code> class, rendered at 60 FPS inside a sandboxed container.</p>
+
+          <p>Scores combine:</p>
+
+          <ul>
+            <li><strong>Source structure.</strong> Required scene class, forbidden shortcuts, and prompt labels present in executable code.</li>
+            <li><strong>Render success.</strong> Manim completes within the time cap and produces valid output media.</li>
+            <li><strong>Visual sanity.</strong> Sampled frames checked for blank output, clipping, clutter, and low contrast.</li>
+            <li><strong>Efficiency.</strong> Runtime, tokens, and estimated cost recorded next to quality.</li>
+          </ul>
+
+          <p>Automated checks cover the obvious cases. Human review can adjust the visual score when reviewers mark a task pass, partial, or fail.</p>
+
+          <h2>Scope</h2>
+
+          <p>ManimBench is not a general video benchmark. Official runs disable network access so scores reflect submitted Python, not downloaded assets.</p>
+
+          <p>A high score means a model cleared a fixed, repeatable bar. It does not replace classroom judgment.</p>
+
+          <h2>Site and repository</h2>
+
+          <p>This site publishes rankings, methodology, and task definitions. The repository holds manifests, container digests, and archived source for verification.</p>
+
+          <h2>V0.5</h2>
+
+          <p>V0.4 fixed the six-task public suite and the file-backed submission contract. V0.5 will add OpenRouter-backed generation, a refreshed task set, draft and live publishing, and batch tooling. The output contract stays the same: one scene per file, sandboxed renders, recorded manifests.</p>
+
+          <p>See the <a href="../index.html#rankings">leaderboard</a>, the <a href="v04-public-suite.html">V0.4 suite</a> write-up, and <a href="how-scoring-works.html">how scoring works</a> for detail.</p>
+        </div>
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <p>ManimBench. Open benchmark for mathematical animation with AI.</p>
+      <p class="footer-links">
+        <a href="../index.html">Leaderboard</a>
+        <a href="../docs.html">Documentation</a>
+        <a href="../methodology.html">Methodology</a>
+        <a href="../faq.html">FAQ</a>
+        <a href="https://github.com/NtrpyDev/manim-bench" target="_blank" rel="noopener">Source</a>
+      </p>
+    </footer>
+  </body>
+</html>
