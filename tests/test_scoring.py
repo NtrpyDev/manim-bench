@@ -7,9 +7,11 @@ from manimbench.paths import DEFAULT_SUITE_PATH
 from manimbench.scoring import result_payload, score_task, source_metadata_with_hash
 from manimbench.tasks import load_suite
 
+V04_SUITE_PATH = DEFAULT_SUITE_PATH.parents[1] / "v0.4" / "suite.yaml"
+
 
 def test_result_payload_records_source_hash_and_render_log():
-    task = load_suite(DEFAULT_SUITE_PATH).tasks[0]
+    task = load_suite(V04_SUITE_PATH).tasks[0]
     source = "from manim import *\n\nclass MainScene(Scene):\n    pass\n"
     render = RenderResult(
         backend="local",
@@ -32,7 +34,7 @@ def test_result_payload_records_source_hash_and_render_log():
 
 
 def test_source_terms_ignore_comments_and_unused_strings(tmp_path):
-    task = load_suite(DEFAULT_SUITE_PATH).tasks[0]
+    task = load_suite(V04_SUITE_PATH).tasks[0]
     source = """from manim import *
 
 # Circle Square Triangle Arrow VGroup Transform
@@ -51,7 +53,7 @@ class MainScene(Scene):
 
 
 def test_placeholder_stub_scene_is_capped(tmp_path):
-    task = load_suite(DEFAULT_SUITE_PATH).tasks[0]
+    task = load_suite(V04_SUITE_PATH).tasks[0]
     source = """from manim import *
 
 class MainScene(Scene):
@@ -70,7 +72,7 @@ class MainScene(Scene):
 
 
 def test_blank_rendered_frame_fails_visual_sanity(tmp_path):
-    task = load_suite(DEFAULT_SUITE_PATH).tasks[0]
+    task = load_suite(V04_SUITE_PATH).tasks[0]
     _write_image(tmp_path / "result.png", "blank")
     render = _successful_render(tmp_path)
 
@@ -81,7 +83,7 @@ def test_blank_rendered_frame_fails_visual_sanity(tmp_path):
 
 
 def test_cluttered_rendered_frame_reduces_score(tmp_path):
-    task = load_suite(DEFAULT_SUITE_PATH).tasks[0]
+    task = load_suite(V04_SUITE_PATH).tasks[0]
     _write_image(tmp_path / "result.png", "clutter")
     render = _successful_render(tmp_path)
 
@@ -92,7 +94,7 @@ def test_cluttered_rendered_frame_reduces_score(tmp_path):
 
 
 def test_edge_clipped_rendered_frame_reduces_score(tmp_path):
-    task = load_suite(DEFAULT_SUITE_PATH).tasks[0]
+    task = load_suite(V04_SUITE_PATH).tasks[0]
     _write_image(tmp_path / "result.png", "edge")
     render = _successful_render(tmp_path)
 
@@ -103,7 +105,7 @@ def test_edge_clipped_rendered_frame_reduces_score(tmp_path):
 
 
 def test_dense_overlap_fixture_reduces_score(tmp_path):
-    task = load_suite(DEFAULT_SUITE_PATH).tasks[0]
+    task = load_suite(V04_SUITE_PATH).tasks[0]
     _write_image(tmp_path / "result.png", "collision")
     render = _successful_render(tmp_path)
 

@@ -1,0 +1,222 @@
+schema_version: "0.5.0"
+models:
+  - id: composer-2-5
+    display_name: Composer 2.5
+    default_enabled: true
+    provider_family: cursor
+    tokenizer: manimbench_regex_estimator_v1
+    pricing:
+      method: configured_benchmark_estimate_rate
+      input_usd_per_1m_tokens: 3.0
+      output_usd_per_1m_tokens: 15.0
+  - id: opus-4-8
+    display_name: Opus 4.8
+    default_enabled: true
+    provider_family: anthropic
+    tokenizer: anthropic_estimate_v1
+    pricing:
+      method: configured_benchmark_estimate_rate
+      input_usd_per_1m_tokens: 15.0
+      output_usd_per_1m_tokens: 75.0
+  - id: gpt-5-5
+    display_name: GPT-5.5
+    default_enabled: true
+    provider_family: openai
+    tokenizer: openai_estimate_v1
+    pricing:
+      method: configured_benchmark_estimate_rate
+      input_usd_per_1m_tokens: 5.0
+      output_usd_per_1m_tokens: 20.0
+  - id: opus-4-6
+    display_name: Opus 4.6
+    default_enabled: true
+    provider_family: anthropic
+    tokenizer: anthropic_estimate_v1
+    pricing:
+      method: configured_benchmark_estimate_rate
+      input_usd_per_1m_tokens: 15.0
+      output_usd_per_1m_tokens: 75.0
+  - id: sonnet-4-6
+    display_name: Sonnet 4.6
+    provider_family: anthropic
+    tokenizer: anthropic_estimate_v1
+    pricing:
+      method: configured_benchmark_estimate_rate
+      input_usd_per_1m_tokens: 3.0
+      output_usd_per_1m_tokens: 15.0
+  - id: codex-5-3
+    display_name: Codex 5.3
+    provider_family: openai
+    tokenizer: openai_estimate_v1
+    pricing:
+      method: configured_benchmark_estimate_rate
+      input_usd_per_1m_tokens: 3.0
+      output_usd_per_1m_tokens: 15.0
+  - id: opus-4-7
+    display_name: Opus 4.7
+    provider_family: anthropic
+    tokenizer: anthropic_estimate_v1
+    pricing:
+      method: configured_benchmark_estimate_rate
+      input_usd_per_1m_tokens: 15.0
+      output_usd_per_1m_tokens: 75.0
+  - id: grok-build-0-1
+    display_name: Grok Build 0.1
+    provider_family: xai
+    tokenizer: xai_estimate_v1
+    pricing:
+      method: configured_benchmark_estimate_rate
+      input_usd_per_1m_tokens: 3.0
+      output_usd_per_1m_tokens: 15.0
+  - id: gpt-5-4
+    display_name: GPT-5.4
+    provider_family: openai
+    tokenizer: openai_estimate_v1
+    pricing:
+      method: configured_benchmark_estimate_rate
+      input_usd_per_1m_tokens: 5.0
+      output_usd_per_1m_tokens: 20.0
+  - id: opus-4-5
+    display_name: Opus 4.5
+    provider_family: anthropic
+    tokenizer: anthropic_estimate_v1
+    pricing:
+      method: configured_benchmark_estimate_rate
+      input_usd_per_1m_tokens: 15.0
+      output_usd_per_1m_tokens: 75.0
+  - id: gpt-5-2
+    display_name: GPT-5.2
+    provider_family: openai
+    tokenizer: openai_estimate_v1
+    pricing:
+      method: configured_benchmark_estimate_rate
+      input_usd_per_1m_tokens: 5.0
+      output_usd_per_1m_tokens: 20.0
+  - id: gemini-3-1-pro
+    display_name: Gemini 3.1 Pro
+    provider_family: google
+    tokenizer: gemini_estimate_v1
+    pricing:
+      method: configured_benchmark_estimate_rate
+      input_usd_per_1m_tokens: 3.0
+      output_usd_per_1m_tokens: 15.0
+  - id: gpt-5-4-mini
+    display_name: GPT-5.4 Mini
+    provider_family: openai
+    tokenizer: openai_estimate_v1
+    pricing:
+      method: configured_benchmark_estimate_rate
+      input_usd_per_1m_tokens: 0.6
+      output_usd_per_1m_tokens: 2.4
+  - id: gpt-5-4-nano
+    display_name: GPT-5.4 Nano
+    provider_family: openai
+    tokenizer: openai_estimate_v1
+    pricing:
+      method: configured_benchmark_estimate_rate
+      input_usd_per_1m_tokens: 0.15
+      output_usd_per_1m_tokens: 0.6
+  - id: haiku-4-5
+    display_name: Haiku 4.5
+    provider_family: anthropic
+    tokenizer: anthropic_estimate_v1
+    pricing:
+      method: configured_benchmark_estimate_rate
+      input_usd_per_1m_tokens: 0.8
+      output_usd_per_1m_tokens: 4.0
+  - id: grok-4-3
+    display_name: Grok 4.3
+    provider_family: xai
+    tokenizer: xai_estimate_v1
+    pricing:
+      method: configured_benchmark_estimate_rate
+      input_usd_per_1m_tokens: 3.0
+      output_usd_per_1m_tokens: 15.0
+  - id: sonnet-4-5
+    display_name: Sonnet 4.5
+    provider_family: anthropic
+    tokenizer: anthropic_estimate_v1
+    pricing:
+      method: configured_benchmark_estimate_rate
+      input_usd_per_1m_tokens: 3.0
+      output_usd_per_1m_tokens: 15.0
+  - id: codex-5-2
+    display_name: Codex 5.2
+    provider_family: openai
+    tokenizer: openai_estimate_v1
+    pricing:
+      method: configured_benchmark_estimate_rate
+      input_usd_per_1m_tokens: 3.0
+      output_usd_per_1m_tokens: 15.0
+  - id: codex-5-1-max
+    display_name: Codex 5.1 Max
+    provider_family: openai
+    tokenizer: openai_estimate_v1
+    pricing:
+      method: configured_benchmark_estimate_rate
+      input_usd_per_1m_tokens: 5.0
+      output_usd_per_1m_tokens: 20.0
+  - id: gpt-5-1
+    display_name: GPT-5.1
+    provider_family: openai
+    tokenizer: openai_estimate_v1
+    pricing:
+      method: configured_benchmark_estimate_rate
+      input_usd_per_1m_tokens: 5.0
+      output_usd_per_1m_tokens: 20.0
+  - id: gemini-3-flash
+    display_name: Gemini 3 Flash
+    provider_family: google
+    tokenizer: gemini_estimate_v1
+    pricing:
+      method: configured_benchmark_estimate_rate
+      input_usd_per_1m_tokens: 0.5
+      output_usd_per_1m_tokens: 2.0
+  - id: gemini-3-5-flash
+    display_name: Gemini 3.5 Flash
+    provider_family: google
+    tokenizer: gemini_estimate_v1
+    pricing:
+      method: configured_benchmark_estimate_rate
+      input_usd_per_1m_tokens: 0.5
+      output_usd_per_1m_tokens: 2.0
+  - id: codex-5-1-mini
+    display_name: Codex 5.1 Mini
+    provider_family: openai
+    tokenizer: openai_estimate_v1
+    pricing:
+      method: configured_benchmark_estimate_rate
+      input_usd_per_1m_tokens: 0.6
+      output_usd_per_1m_tokens: 2.4
+  - id: sonnet-4
+    display_name: Sonnet 4
+    provider_family: anthropic
+    tokenizer: anthropic_estimate_v1
+    pricing:
+      method: configured_benchmark_estimate_rate
+      input_usd_per_1m_tokens: 3.0
+      output_usd_per_1m_tokens: 15.0
+  - id: gpt-5-mini
+    display_name: GPT-5 Mini
+    provider_family: openai
+    tokenizer: openai_estimate_v1
+    pricing:
+      method: configured_benchmark_estimate_rate
+      input_usd_per_1m_tokens: 0.6
+      output_usd_per_1m_tokens: 2.4
+  - id: gemini-2-5-flash
+    display_name: Gemini 2.5 Flash
+    provider_family: google
+    tokenizer: gemini_estimate_v1
+    pricing:
+      method: configured_benchmark_estimate_rate
+      input_usd_per_1m_tokens: 0.5
+      output_usd_per_1m_tokens: 2.0
+  - id: kimi-k2-5
+    display_name: Kimi K2.5
+    provider_family: openrouter
+    tokenizer: manimbench_regex_estimator_v1
+    pricing:
+      method: configured_benchmark_estimate_rate
+      input_usd_per_1m_tokens: 3.0
+      output_usd_per_1m_tokens: 15.0

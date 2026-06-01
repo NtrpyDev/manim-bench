@@ -7,6 +7,22 @@ from manimbench.tasks import load_suite
 def test_load_default_suite():
     suite = load_suite(DEFAULT_SUITE_PATH)
 
+    assert suite.id == "manimbench-v0.5-public"
+    assert len(suite.tasks) == 6
+    assert {task.id for task in suite.tasks} == {
+        "coordinate_system_animation",
+        "derivative_motion_story",
+        "matrix_transformation_grid",
+        "geometric_area_proof",
+        "probability_distribution_simulation",
+        "fourier_series_decomposition",
+    }
+    assert suite.tasks[0].automated_checks["min_required_labels"] == 5
+
+
+def test_load_v04_suite_by_path():
+    suite = load_suite(DEFAULT_SUITE_PATH.parents[1] / "v0.4" / "suite.yaml")
+
     assert suite.id == "manimbench-v0.4-public"
     assert len(suite.tasks) == 6
     assert {task.id for task in suite.tasks} == {
@@ -17,7 +33,6 @@ def test_load_default_suite():
         "probability_distribution",
         "advanced_math_explanation",
     }
-    assert suite.tasks[0].automated_checks["min_required_labels"] == 6
 
 
 def test_task_paths_are_absolute():

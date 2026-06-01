@@ -5,7 +5,8 @@ ManimBench tracks:
 - Wall-clock generation time.
 - Prompt/input tokens from the active suite's `tasks/*.md`.
 - Output tokens from the active suite's generated `outputs/*.py`.
-- Estimated USD cost from configured per-model rates in `models/models.yaml`.
+- Estimated USD cost from configured per-model rates in `models/public.yaml`.
+- Real provider token and cost fields when returned by API-backed generation.
 
 For model workspace runs:
 
@@ -31,11 +32,12 @@ cd manimbench
 python collect_usage.py
 ```
 
-The default is V0.4 suite-scoped accounting, so it counts the six default
+The default is V0.5 suite-scoped accounting, so it counts the six default
 `tasks/<task_id>.md` prompts and matching `outputs/<task_id>.py` files. To
-backfill V0.3 single-video folders, run:
+backfill V0.4 or V0.3 folders, pass the suite explicitly:
 
 ```bash
+python collect_usage.py --suite benchmarks/v0.4/suite.yaml
 python collect_usage.py --suite benchmarks/v0.3/suite.yaml
 ```
 

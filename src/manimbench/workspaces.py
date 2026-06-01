@@ -6,12 +6,13 @@ from pathlib import Path
 
 import yaml
 
+from manimbench.model_registry import PUBLIC_MODELS_PATH
 from manimbench.paths import DEFAULT_PROMPT_PATH, DEFAULT_SUITE_PATH, PROJECT_ROOT
 from manimbench.prompting import build_task_prompt, load_master_prompt
 from manimbench.tasks import filter_tasks, load_suite
 
 
-MODEL_REGISTRY = PROJECT_ROOT / "models" / "models.yaml"
+MODEL_REGISTRY = PUBLIC_MODELS_PATH
 WORKSPACES_ROOT = PROJECT_ROOT / "model_tests"
 
 
@@ -20,14 +21,14 @@ def create_model_workspaces(args: argparse.Namespace) -> int:
     suite = load_suite(suite_path)
     tasks = filter_tasks(suite, args.task)
     master_prompt = load_master_prompt(args.prompt or DEFAULT_PROMPT_PATH)
-    models = _load_models(MODEL_REGISTRY)
+    models = _select_models(_load_models(MODEL_REGISTRY), getattr(args, "model", None))
 
     WORKSPACES_ROOT.mkdir(parents=True, exist_ok=True)
     for model in models:
         _write_model_workspace(model, suite_path, suite, tasks, master_prompt, force=args.force)
 
     print(f"Created/updated {len(models)} optional model test folders in {WORKSPACES_ROOT}")
-    print("Canonical V0.4 input is still plain outputs/<model>/<task_id>.py files.")
+    print("Canonical V0.5 input is plain outputs/<model>/<task_id>.py files.")
     return 0
 
 
@@ -37,6 +38,18 @@ def _load_models(path: Path) -> list[dict[str, str]]:
     if not isinstance(models, list) or not models:
         raise ValueError(f"No models found in {path}")
     return models
+
+
+def _select_models(models: list[dict[str, str]], requested: list[str] | None) -> list[dict[str, str]]:
+    if requested:
+        requested_set = set(requested)
+        selected = [model for model in models if model["id"] in requested_set]
+        missing = sorted(requested_set - {model["id"] for model in selected})
+        if missing:
+            raise ValueError(f"Unknown model IDs: {', '.join(missing)}")
+        return selected
+    defaults = [model for model in models if model.get("default_enabled")]
+    return defaults or models
 
 
 def _write_model_workspace(
@@ -126,15 +139,11 @@ PYTHONPATH=src python -m manimbench.cli share-video \\
   --model "{model_id}" \\
   --output-dir "reports/$RUN_ID/videos"
 PYTHONPATH=src python -m manimbench.cli report --run-dir "runs/$RUN_ID"
-PYTHONPATH=src python -m manimbench.cli build-site \\
-  --report-dir "reports/$RUN_ID" \\
-  --output-dir "site/$RUN_ID"
 
 echo
 echo "Report: $ROOT/reports/$RUN_ID/index.html"
 echo "Usage: $ROOT/model_tests/{model_id}/usage.json"
 echo "Final video: $ROOT/reports/$RUN_ID/videos/{model_id}.mp4"
-echo "Site bundle: $ROOT/site/$RUN_ID"
 exit "$BENCH_EXIT"
 """
     path.write_text(text, encoding="utf-8")
@@ -159,7 +168,7 @@ def _readme(model_id: str, display_name: str, suite_id: str, task_count: int) ->
 
 This optional workspace is for testing **{display_name}** when a coding tool works best inside an isolated folder.
 
-The canonical V0.4 input format is still plain files under `outputs/<model>/`.
+The canonical V0.5 input format is plain files under `outputs/<model>/`.
 
 ## How To Use
 
@@ -239,8 +248,7 @@ MANIMBENCH_SANDBOX=local ./run_smoke.sh
 2. Write usage, token, time, and estimated USD cost to `usage.json`.
 3. Sample frames and create `review.json` for visual judging.
 4. Build the final shareable MP4 and thumbnail under `../../reports/<run_id>/videos/`.
-5. Generate the website-ready HTML report, leaderboard JSON, and ranking graphs under `../../reports/<run_id>/`.
-6. Build a deployable static site bundle under `../../site/<run_id>/`.
+5. Generate the HTML report, leaderboard JSON, and ranking graphs under `../../reports/<run_id>/`.
 """
 
 

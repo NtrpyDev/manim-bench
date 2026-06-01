@@ -1,145 +1,133 @@
 # ManimBench
 
-ManimBench is a sandboxed benchmark for evaluating how well AI models generate high-quality [Manim Community Edition](https://www.manim.community/) animations and visually explain mathematics.
+ManimBench is a sandboxed benchmark for evaluating how well AI models generate
+high-quality [Manim Community Edition](https://www.manim.community/) animations
+and visually explain mathematics.
 
-The benchmark is designed for public, reproducible comparison at `manimbench.site`. Every model receives the same master [`prompt.md`](prompt.md), the same versioned task definitions, and the same execution constraints.
+The engine repo contains the benchmark runner, task suites, provider adapters,
+scoring, reports, and publish handoff. The public site is published from a
+separate site repository; this repo does not contain a `website/` tree.
 
-## What It Measures
+## Quickstart
 
-ManimBench tests whether a model can:
+```bash
+python -m pip install -e ".[dev]"
+```
 
-- Write valid ManimCE scene code.
-- Render at 60 FPS within a 2 minute runtime limit.
-- Clearly label examples, diagrams, graphs, equations, variables, transformations, and mathematical steps.
-- Explain mathematical ideas with accurate, idiomatic, visually clear animation.
-- Avoid fake, hardcoded, or superficial solutions.
-- Produce reproducible results under sandboxed execution.
+For local rendering outside the official container, install the render extras:
+
+```bash
+python -m pip install -e ".[dev,render]"
+```
+
+List the default V0.5 tasks:
+
+```bash
+manimbench list-tasks
+```
+
+Generate outputs through the provider registry. `auto` is the default: it uses
+OpenRouter for public API models and Cursor Agent CLI for Composer 2.5.
+
+```bash
+manimbench generate --model composer-2-5 --provider cursor --output-dir outputs --smoke
+```
+
+Run and report those generated files:
+
+```bash
+manimbench run-file-matrix \
+  --model-output composer-2-5=outputs/composer-2-5 \
+  --sandbox container \
+  --parallel 2 \
+  --run-id v05-composer-2-5
+
+manimbench report --run-dir runs/v05-composer-2-5
+```
+
+Publish report data and videos to the separate site repository:
+
+```bash
+manimbench publish \
+  --run-dir runs/v05-composer-2-5 \
+  --target draft \
+  --site-repo ../manimbench-site
+```
+
+See [docs/reproduce.md](docs/reproduce.md),
+[docs/cursor-composer.md](docs/cursor-composer.md), and
+[docs/publish-to-site.md](docs/publish-to-site.md) for the full workflows.
 
 ## Project Layout
 
 ```text
 manimbench/
   prompt.md                 # Shared model instructions, used for every task.
-  benchmarks/v0.4/          # Default six-task public benchmark suite.
+  benchmarks/v0.5/          # Default six-task public benchmark suite.
+  benchmarks/v0.4/          # Previous six-task public benchmark suite.
   benchmarks/v0.3/          # Older one-video composite benchmark suite.
   benchmarks/v2/            # Previous composite benchmark suite.
   benchmarks/v1/            # Legacy multi-task public suite.
-  src/manimbench/           # Runner, providers, sandbox, scoring, reports.
+  src/manimbench/           # Orchestrator, CLI, providers, sandbox, scoring.
   sandbox/                  # Container image for official benchmark runs.
-  models/                   # Example model/provider configuration.
+  models/                   # Public model registry and provider routes.
   runs/                     # Generated run artifacts, ignored by git.
-  reports/                  # Static reports, ignored by git.
-  website/                  # Public site source for manimbench.site.
+  reports/                  # Static reports and JSON exports, ignored by git.
+  outputs/                  # Generated model outputs, ignored by git.
   docs/                     # Contributor and methodology docs.
 ```
 
-Generate a deployable site bundle after reporting:
+## Output Contract
 
-```bash
-manimbench build-site --report-dir reports/<run_id> --output-dir site/<run_id>
-```
-
-See [docs/deploy-site.md](docs/deploy-site.md) for Cloudflare Pages setup.
-
-## Quickstart
-
-Install the package:
-
-```bash
-cd manimbench
-python -m pip install -e ".[dev]"
-```
-
-For local rendering outside the official container, install the render extras too:
-
-```bash
-python -m pip install -e ".[dev,render]"
-```
-
-ManimBench V0.4 is file-backed. It does not generate model answers for you and
-does not depend on editor-specific project state. Generate one Python file per
-task with your model or coding tool of choice, then save the files here:
+The default suite is `benchmarks/v0.5/suite.yaml`. Each generated output is one
+Python file under:
 
 ```text
-outputs/<model>/
-  basic_manim_layout.py
-  calculus_derivative_graph.py
-  linear_algebra_transformation.py
-  geometry_measurement_diagram.py
-  probability_distribution.py
-  advanced_math_explanation.py
+outputs/<model>/<task_id>.py
 ```
 
-Each file must define one ManimCE scene class named `MainScene`.
-
-Run the guided launcher:
-
-```bash
-python start_benchmark.py
-```
-
-Choose the public V0.4 suite, select the model output folder, and use the
-container sandbox for official comparisons. The launcher runs the benchmark and
-writes `runs/<run_id>` plus `reports/<run_id>/index.html`.
-
-The shell wrapper is equivalent:
+Each file must define a ManimCE scene class named `MainScene`, render at 60 FPS,
+and stay under the 120 second task limit. The V0.4 suite remains runnable:
 
 ```bash
-bash scripts/start_benchmark.sh
-```
-
-For direct non-interactive runs:
-
-```bash
-manimbench run-file-matrix \
+manimbench --suite benchmarks/v0.4/suite.yaml list-tasks
+manimbench --suite benchmarks/v0.4/suite.yaml run-file-matrix \
   --model-output my-model=outputs/my-model \
-  --sandbox container \
-  --run-id v04-my-model
-manimbench report --run-dir runs/v04-my-model
-manimbench build-site --report-dir reports/v04-my-model --output-dir site/v04-my-model
+  --sandbox local
 ```
 
-Generated model workspaces are still available as an optional helper for agents
-that work well from isolated folders:
+## Generation
+
+`generate` and `generate-batch` default to `--provider auto`. Auto routes
+`composer-2-5` through Cursor Agent CLI because OpenRouter does not currently
+publish a Composer model slug; other public models route through OpenRouter.
+Direct provider routes are exposed for bypass testing:
 
 ```bash
-python setup_model_workspaces.py
+manimbench list-models --public
+
+cursor-agent login
+manimbench generate --model composer-2-5 --provider cursor --output-dir outputs
+
+export OPENROUTER_API_KEY=...
+manimbench generate-batch \
+  --models gpt-5-5,opus-4-8 \
+  --provider auto \
+  --output-dir outputs \
+  --parallel 2 \
+  --smoke
 ```
 
-Those folders live under `model_tests/<model>/` and use the same output
-contract: write `outputs/<task_id>.py`, then run `./run_benchmark.sh`.
+Generation is resumable. Complete files are skipped unless `--force` is passed.
+Checkpoint state is written to `.manimbench/runs/<run_id>/state.json`, and API
+call records are appended to `.manimbench/runs/<run_id>/generation.log`.
+Provider usage is also summarized in `outputs/<model>/usage.json` when real
+token or cost data is available. Cursor Agent CLI does not return token/cost
+metadata, so Cursor spend remains visible in the Cursor dashboard.
 
-When model workspaces finish generating outputs, auto-compare the ready models:
+## Rendering And Reports
 
-```bash
-python run_comparison.py
-```
-
-Track usage/cost for model workspaces:
-
-```bash
-python collect_usage.py
-```
-
-List tasks:
-
-```bash
-manimbench list-tasks
-```
-
-The default suite is the public `benchmarks/v0.4/suite.yaml`, which asks each
-model for six focused outputs named `outputs/<task_id>.py`. The older
-`benchmarks/v0.3/suite.yaml` single-video showcase, `benchmarks/v2/suite.yaml`,
-`benchmarks/v1/suite.yaml` multi-task suite, and smaller
-`benchmarks/v0/suite.yaml` smoke suite remain available explicitly.
-
-Write the exact per-task prompts that will be sent to models:
-
-```bash
-manimbench write-prompts --output-dir runs/prompts-v04
-```
-
-Run a prepared V0.4 output folder with the local development sandbox:
+Run a prepared output folder:
 
 ```bash
 manimbench run \
@@ -149,94 +137,36 @@ manimbench run \
   --sandbox local
 ```
 
-If ManimCE already exists in another environment, point the local runner at that
-executable with `--manim-executable /path/to/manim`.
-
-Run the same task suite against multiple file-backed models in one comparison
-run:
+Run multiple models with bounded concurrency:
 
 ```bash
 manimbench run-file-matrix \
   --model-output model-a=outputs/model-a \
   --model-output model-b=outputs/model-b \
+  --parallel 2 \
   --sandbox container
 ```
 
-Render and score a single saved solution:
+Render and score one saved solution:
 
 ```bash
 manimbench render \
   --model my-model \
-  --task-id basic_manim_layout \
-  --solution outputs/my-model/basic_manim_layout.py \
+  --task-id coordinate_system_animation \
+  --solution outputs/my-model/coordinate_system_animation.py \
   --sandbox local
 ```
 
-Rerun only failed tasks from a previous run:
+Reports write human-readable pages plus machine-readable data under
+`reports/<run_id>/data/*.json`. The exported `leaderboard.json` uses schema
+version `0.5.0`.
 
-```bash
-manimbench rerun-failed \
-  --previous-run-dir runs/<run_id> \
-  --model example-model \
-  --outputs-dir sample_outputs/example-model \
-  --sandbox local
-```
+## Reproducibility
 
-Aggregate existing result JSON files into a score summary:
+Run manifests are immutable once created. They record the suite metadata,
+prompt hash, task hashes, configured OpenRouter slugs, provider route, Docker
+image digest when available, git commit, scoring version, and publish history
+reference.
 
-```bash
-manimbench score --run-dir runs/<run_id>
-```
-
-Generate a static report:
-
-```bash
-manimbench report --run-dir runs/<run_id>
-```
-
-Official results should use the container sandbox:
-
-```bash
-manimbench run \
-  --model frontier-model \
-  --provider file \
-  --outputs-dir sample_outputs/frontier-model \
-  --sandbox container
-```
-
-## Report Landing Page
-
-The generated report is designed around a benchmark dashboard landing screen. It includes:
-
-- A hero summary with benchmark version, model count, task count, and run metadata.
-- Two ranking charts comparing all models:
-  - Overall ManimBench score.
-  - Efficiency score, combining score with runtime and cost metadata when available.
-- A model comparison table with pass rate, average score, render success, average time, cost, tokens, and artifact links.
-- Per-model and per-task result sections suitable for a future `manimbench.site` results browser.
-- Site-ready JSON files under `reports/<run_id>/data/`, plus per-model and per-task HTML pages.
-
-The visual goal is a compact benchmark landing page with rankings and readable details, not a clone of any existing site.
-
-## Benchmark Versions
-
-Tasks live under `benchmarks/<version>/`. Public results should always record:
-
-- Benchmark suite version.
-- Master prompt hash.
-- Task file hashes.
-- Model metadata.
-- ManimCE version.
-- Python version.
-- Sandbox backend and container image.
-- Scoring version.
-
-## Sandbox Policy
-
-The container backend is the official execution path. It runs with network disabled, a controlled per-run mount, non-root user, CPU and memory limits, process limits, and a wall-clock timeout.
-
-The local subprocess backend is provided only for development and debugging. Local results are marked `official: false`.
-
-## Status
-
-This repository now defaults to the V0.4 six-task public suite. The architecture is intentionally modular so new tasks, providers, scoring checks, and report views can be added without changing the public result format.
+Official results should use the container sandbox. The local subprocess backend
+is for development and debugging; local results are marked `official: false`.

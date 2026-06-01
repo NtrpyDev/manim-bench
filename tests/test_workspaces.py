@@ -22,8 +22,9 @@ def test_workspace_generator_is_agent_neutral(tmp_path, monkeypatch):
 
     rc = workspaces.create_model_workspaces(
         argparse.Namespace(
-            suite=DEFAULT_SUITE_PATH,
+            suite=DEFAULT_SUITE_PATH.parents[1] / "v0.4" / "suite.yaml",
             prompt=None,
+            model=["model-a"],
             task=["basic_manim_layout"],
             force=True,
         )

@@ -177,7 +177,7 @@ def _leaderboard_payload(
             }
         )
     return {
-        "schema_version": "0.4.0",
+        "schema_version": "0.5.0",
         "run_id": manifest.get("run_id", run_dir.name),
         "suite": manifest.get("suite", {}),
         "models": entries,

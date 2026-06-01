@@ -50,6 +50,8 @@ def start_wizard(args: argparse.Namespace) -> int:
         timeout_seconds=timeout_seconds,
         container_image=container_image,
         manim_executable=str(manim_executable),
+        allow_stale=False,
+        parallel=1,
     )
 
     print("\nStarting benchmark...")
@@ -73,7 +75,7 @@ def start_wizard(args: argparse.Namespace) -> int:
 
 def _choose_suite_and_tasks() -> tuple[Path, list[str] | None]:
     print("Benchmark size:")
-    print("  1. Public suite (v0.4, six focused tasks)")
+    print("  1. Public suite (v0.5, six focused tasks)")
     print("  2. Smoke test (v0, one quick task)")
     print("  3. Public suite, choose task IDs")
     choice = _prompt("Select option", "1")
@@ -108,12 +110,12 @@ def _choose_model_outputs() -> list[tuple[str, Path]]:
                 return selected
 
     model = _prompt("Model name", "my-model")
-    path = Path(_prompt("Output directory path", f"sample_outputs/{model}")).expanduser()
+    path = Path(_prompt("Output directory path", f"outputs/{model}")).expanduser()
     return [(model, path)]
 
 
 def _discover_model_output_dirs() -> list[tuple[str, Path]]:
-    roots = [PROJECT_ROOT / "outputs", PROJECT_ROOT / "sample_outputs", PROJECT_ROOT / "model_outputs"]
+    roots = [PROJECT_ROOT / "outputs", PROJECT_ROOT / "model_outputs"]
     discovered: list[tuple[str, Path]] = []
     for root in roots:
         if not root.exists():

@@ -1,7 +1,7 @@
 # Adding Benchmark Tasks
 
-Tasks live under versioned suite directories such as `benchmarks/v0.4/tasks/`.
-The default public suite is `benchmarks/v0.4/suite.yaml`; `benchmarks/v0`
+Tasks live under versioned suite directories such as `benchmarks/v0.5/tasks/`.
+The default public suite is `benchmarks/v0.5/suite.yaml`; `benchmarks/v0`
 remains as a small smoke-test suite.
 
 Each task should define:

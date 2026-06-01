@@ -10,11 +10,12 @@ from typing import Any
 
 import yaml
 
+from manimbench.model_registry import PUBLIC_MODELS_PATH
 from manimbench.paths import PROJECT_ROOT
 from manimbench.tasks import load_suite
 
 
-MODEL_REGISTRY = PROJECT_ROOT / "models" / "models.yaml"
+MODEL_REGISTRY = PUBLIC_MODELS_PATH
 MODEL_TESTS_ROOT = PROJECT_ROOT / "model_tests"
 
 

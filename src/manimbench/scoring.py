@@ -25,7 +25,7 @@ except Exception:  # pragma: no cover - exercised only in stripped envs.
 from manimbench.models import RenderResult, ScoreResult, Task
 
 
-SCORING_VERSION = "0.4.0"
+SCORING_VERSION = "0.5.0"
 TEXT_CALLS = {"Text", "Tex", "MathTex", "MarkupText", "Paragraph", "Title"}
 STATIC_ASSET_CALLS = {"ImageMobject", "SVGMobject", "VideoMobject", "open", "Image.open"}
 

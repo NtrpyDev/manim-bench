@@ -37,6 +37,8 @@ def test_report_generation(tmp_path):
     assert "Final Share Videos" in index.read_text(encoding="utf-8")
     assert (tmp_path / "reports" / "demo" / "data" / "tasks.json").exists()
     assert (tmp_path / "reports" / "demo" / "data" / "leaderboard.json").exists()
+    leaderboard = json.loads((tmp_path / "reports" / "demo" / "data" / "leaderboard.json").read_text(encoding="utf-8"))
+    assert leaderboard["schema_version"] == "0.5.0"
     assert (tmp_path / "reports" / "demo" / "report.md").exists()
     assert (tmp_path / "reports" / "demo" / "models" / "model-a.html").exists()
     assert (tmp_path / "reports" / "demo" / "tasks" / "task-a.html").exists()

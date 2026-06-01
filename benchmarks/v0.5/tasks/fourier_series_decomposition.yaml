@@ -1,0 +1,47 @@
+id: fourier_series_decomposition
+version: "0.5.0"
+difficulty: focused
+domains:
+  - advanced_math
+  - signals
+title: Fourier Series Decomposition
+runtime_limit_seconds: 120
+prompt: |
+  Create a ManimCE animation that explains a Fourier series approximation of a
+  square wave or similar periodic signal.
+
+  Requirements:
+  - Define exactly one primary scene class named MainScene.
+  - Show component sine waves, their summed approximation, and a target signal.
+  - Label harmonic 1, harmonic 3, harmonic 5, partial sum, and target wave.
+  - Animate adding at least three harmonics into the partial sum.
+  - Use clear color coding and avoid dense overlapping formulas.
+required_labels:
+  - Fourier series
+  - harmonic 1
+  - harmonic 3
+  - harmonic 5
+  - partial sum
+  - target wave
+required_visuals:
+  - component waves
+  - summed approximation
+  - target signal
+  - staged harmonic addition
+automated_checks:
+  required_scene_class: MainScene
+  forbidden_imports: [requests, socket, urllib, subprocess, pathlib.Path.home]
+  min_required_labels: 5
+  fps: 60
+  max_duration_seconds: 120
+  required_source_terms:
+    - Axes
+    - MathTex
+    - VGroup
+    - always_redraw
+    - ValueTracker
+    - Create
+rubric:
+  mathematical_correctness: Harmonics and partial sum are presented coherently.
+  visual_clarity: Component and target waves are distinguishable.
+  animation_quality: Harmonic additions are staged and readable.

@@ -1,0 +1,48 @@
+id: probability_distribution_simulation
+version: "0.5.0"
+difficulty: focused
+domains:
+  - probability
+  - statistics
+title: Probability Distribution Simulation
+runtime_limit_seconds: 120
+prompt: |
+  Create a deterministic ManimCE animation that explains a probability
+  distribution with a small simulation-style visualization.
+
+  Requirements:
+  - Define exactly one primary scene class named MainScene.
+  - Show a labeled histogram or bar chart, expected value marker, sample count,
+    and probability labels.
+  - Use deterministic values; do not call random functions.
+  - Include at least four visible bars and a formula or notation for P(X = k).
+  - Keep the chart readable and include a short visual takeaway.
+required_labels:
+  - probability distribution
+  - sample count
+  - expected value
+  - P(X = k)
+  - outcome
+  - probability
+required_visuals:
+  - histogram or bar chart
+  - expected value marker
+  - probability labels
+  - deterministic sample counts
+automated_checks:
+  required_scene_class: MainScene
+  forbidden_imports: [requests, socket, urllib, subprocess, pathlib.Path.home, random]
+  min_required_labels: 5
+  fps: 60
+  max_duration_seconds: 120
+  required_source_terms:
+    - BarChart
+    - MathTex
+    - Text
+    - VGroup
+    - Line
+    - Rectangle
+rubric:
+  mathematical_correctness: Probabilities and expected value marker are coherent.
+  visual_clarity: Bars, axes, and labels are readable.
+  animation_quality: The simulated counts build or update visibly.

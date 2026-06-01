@@ -6,6 +6,7 @@ def test_cli_exposes_planned_commands():
 
     assert parser.parse_args(["list-tasks"]).func.__name__ == "cmd_list_tasks"
     assert parser.parse_args(["start"]).func.__name__ == "cmd_start"
+    assert parser.parse_args(["list-models"]).func.__name__ == "cmd_list_models"
     assert parser.parse_args(["create-workspaces"]).func.__name__ == "cmd_create_workspaces"
     assert parser.parse_args(["usage-start"]).func.__name__ == "cmd_usage_start"
     assert parser.parse_args(["usage-finish"]).func.__name__ == "cmd_usage_finish"
@@ -15,17 +16,22 @@ def test_cli_exposes_planned_commands():
         == "cmd_share_video"
     )
     assert parser.parse_args(["review", "init", "--run-dir", "runs/demo"]).func.__name__ == "cmd_review"
+    assert parser.parse_args(["generate", "--model", "composer-2-5"]).func.__name__ == "cmd_generate"
     assert (
-        parser.parse_args(["build-site", "--report-dir", "reports/demo", "--output-dir", "site/demo"]).func.__name__
-        == "cmd_build_site"
+        parser.parse_args(["generate", "--model", "composer-2-5", "--provider", "cursor"]).provider
+        == "cursor"
     )
+    assert parser.parse_args(["generate-batch", "--models", "composer-2-5,gpt-5-5"]).func.__name__ == "cmd_generate_batch"
+    assert parser.parse_args(["publish", "--run-dir", "runs/demo", "--target", "draft"]).func.__name__ == "cmd_publish"
     assert parser.parse_args(["score", "--run-dir", "runs/demo"]).func.__name__ == "cmd_score"
     assert (
         parser.parse_args(
             [
                 "run-file-matrix",
                 "--model-output",
-                "example=sample_outputs/example-model",
+                "example=outputs/example",
+                "--parallel",
+                "2",
             ]
         ).func.__name__
         == "cmd_run_file_matrix"
@@ -51,7 +57,7 @@ def test_cli_exposes_planned_commands():
                 "--model",
                 "example",
                 "--outputs-dir",
-                "sample_outputs/example",
+                "outputs/example",
             ]
         ).func.__name__
         == "cmd_rerun_failed"
