@@ -1,0 +1,48 @@
+id: matrix_transformation_grid
+version: "0.6.0"
+difficulty: focused
+domains:
+  - linear_algebra
+  - transformations
+title: Matrix Transformation Grid
+runtime_limit_seconds: 120
+prompt: |
+  Create a ManimCE animation that visualizes a 2D matrix transformation on a
+  coordinate grid.
+
+  Requirements:
+  - Define exactly one primary scene class named MainScene.
+  - Show an original basis, transformed basis vectors, a grid or plane, and a
+    displayed 2x2 matrix.
+  - Animate a shape or vector through the transformation.
+  - Label i-hat, j-hat, transformed i-hat, transformed j-hat, and determinant.
+  - Explain visually whether area is preserved, expanded, or flipped.
+required_labels:
+  - matrix transformation
+  - i-hat
+  - j-hat
+  - transformed i-hat
+  - transformed j-hat
+  - determinant
+required_visuals:
+  - coordinate grid
+  - original and transformed basis vectors
+  - 2x2 matrix
+  - transformed shape or vector
+automated_checks:
+  required_scene_class: MainScene
+  forbidden_imports: [requests, socket, urllib, subprocess, pathlib.Path.home]
+  min_required_labels: 5
+  fps: 60
+  max_duration_seconds: 120
+  required_source_terms:
+    - NumberPlane
+    - Vector
+    - Matrix
+    - Transform
+    - Polygon
+    - MathTex
+rubric:
+  mathematical_correctness: The displayed matrix matches the visual transformation.
+  visual_clarity: Original and transformed elements are distinguishable.
+  animation_quality: The transformation is animated, not only shown statically.

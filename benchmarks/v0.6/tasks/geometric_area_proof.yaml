@@ -1,0 +1,50 @@
+id: geometric_area_proof
+version: "0.6.0"
+difficulty: focused
+domains:
+  - geometry
+  - proof
+title: Geometric Area Proof
+runtime_limit_seconds: 120
+prompt: |
+  Create a ManimCE animation that presents a geometric area proof of the
+  Pythagorean theorem or an equivalent area identity.
+
+  Requirements:
+  - Define exactly one primary scene class named MainScene.
+  - Use labeled geometric shapes, side lengths, area labels, and a rearrangement
+    or transform that makes the identity visible.
+  - Include labels for a, b, c, a^2, b^2, c^2, and total area.
+  - Show at least two stages: before rearrangement and after rearrangement.
+  - Avoid crowded labels and keep the final equation visible.
+required_labels:
+  - area proof
+  - a
+  - b
+  - c
+  - a^2
+  - b^2
+  - c^2
+  - total area
+required_visuals:
+  - labeled right triangle or squares
+  - area blocks
+  - rearrangement animation
+  - final equation
+automated_checks:
+  required_scene_class: MainScene
+  forbidden_imports: [requests, socket, urllib, subprocess, pathlib.Path.home]
+  min_required_labels: 6
+  fps: 60
+  max_duration_seconds: 120
+  required_source_terms:
+    - Polygon
+    - Square
+    - MathTex
+    - VGroup
+    - Transform
+    - Text
+rubric:
+  mathematical_correctness: The area relation is valid and visually justified.
+  visual_clarity: Side and area labels are readable and not ambiguous.
+  animation_quality: The rearrangement supports the proof.

@@ -1,0 +1,47 @@
+id: coordinate_system_animation
+version: "0.6.0"
+difficulty: focused
+domains:
+  - manim_basics
+  - coordinate_geometry
+title: Coordinate System Animation
+runtime_limit_seconds: 120
+prompt: |
+  Create a concise Manim Community Edition animation that introduces a 2D
+  coordinate system and traces a point along a simple curve.
+
+  Requirements:
+  - Define exactly one primary scene class named MainScene.
+  - Use Axes, Dot, Arrow, Text or MathTex labels, and a visible traced path.
+  - Label the x-axis, y-axis, origin, moving point, and curve equation.
+  - Include a step indicator showing at least three moments in the motion.
+  - Keep labels readable, avoid edge clipping, and do not use external assets.
+required_labels:
+  - Coordinate system
+  - x-axis
+  - y-axis
+  - origin
+  - moving point
+  - y = x^2
+required_visuals:
+  - labeled axes
+  - moving point
+  - traced curve
+  - step indicator
+automated_checks:
+  required_scene_class: MainScene
+  forbidden_imports: [requests, socket, urllib, subprocess, pathlib.Path.home]
+  min_required_labels: 5
+  fps: 60
+  max_duration_seconds: 120
+  required_source_terms:
+    - Axes
+    - Dot
+    - Arrow
+    - Text
+    - MathTex
+    - TracedPath
+rubric:
+  visual_clarity: Axes, labels, and moving point are readable and not clipped.
+  manim_idiom: Uses native Manim objects and animations.
+  animation_quality: The point motion and trace are easy to follow.
