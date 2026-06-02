@@ -20,7 +20,7 @@ For local rendering outside the official container, install the render extras:
 python -m pip install -e ".[dev,render]"
 ```
 
-List the default V0.5 task suite, scored by the V0.6 engine:
+List the default V0.6 public suite:
 
 ```bash
 manimbench list-tasks
@@ -40,16 +40,16 @@ manimbench run-file-matrix \
   --model-output composer-2-5=outputs/composer-2-5 \
   --sandbox container \
   --parallel 2 \
-  --run-id v05-composer-2-5
+  --run-id v06-composer-2-5
 
-manimbench report --run-dir runs/v05-composer-2-5
+manimbench report --run-dir runs/v06-composer-2-5
 ```
 
 Publish report data and videos to the separate site repository:
 
 ```bash
 manimbench publish \
-  --run-dir runs/v05-composer-2-5 \
+  --run-dir runs/v06-composer-2-5 \
   --target draft \
   --site-repo ../manimbench-site
 ```
@@ -63,8 +63,9 @@ See [docs/reproduce.md](docs/reproduce.md),
 ```text
 manimbench/
   prompt.md                 # Shared model instructions, used for every task.
-  benchmarks/v0.5/          # Default six-task public benchmark suite.
-  benchmarks/v0.4/          # Previous six-task public benchmark suite.
+  benchmarks/v0.6/          # Default six-task public benchmark suite.
+  benchmarks/v0.5/          # Previous six-task public benchmark suite.
+  benchmarks/v0.4/          # Older six-task public benchmark suite.
   benchmarks/v0.3/          # Older one-video composite benchmark suite.
   benchmarks/v2/            # Previous composite benchmark suite.
   benchmarks/v1/            # Legacy multi-task public suite.
@@ -79,7 +80,7 @@ manimbench/
 
 ## Output Contract
 
-The default suite is `benchmarks/v0.5/suite.yaml`. Each generated output is one
+The default suite is `benchmarks/v0.6/suite.yaml`. Each generated output is one
 Python file under:
 
 ```text
@@ -87,7 +88,7 @@ outputs/<model>/<task_id>.py
 ```
 
 Each file must define a ManimCE scene class named `MainScene`, render at 60 FPS,
-and stay under the 120 second task limit. The V0.4 suite remains runnable:
+and stay under the 120 second task limit. Earlier suites remain runnable by path:
 
 ```bash
 manimbench --suite benchmarks/v0.4/suite.yaml list-tasks
