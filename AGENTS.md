@@ -19,3 +19,7 @@ When the user asks for a TLDR, answer the actual question in the first sentence.
 # Direct Capability Answers
 
 When the user asks whether Codex can do something, answer the exact requested outcome first. If any required part of the requested outcome cannot be done, the answer is `no`; do not reframe a partial workaround as `yes`, and do not add excuse-like context before the direct answer.
+
+# Release Version Labels
+
+When an engine, scoring, report schema, or benchmark release changes the version number, all active user-facing labels, site data, docs, default suite metadata, and current-run examples must use the new release version only. Older version numbers may appear only in explicitly historical/archive/reproduction contexts, never in the current release title, suite label, leaderboard label, homepage status, or default workflow copy.
