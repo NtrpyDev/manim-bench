@@ -15,3 +15,7 @@ Known limitation: the final response tokens may not be included because the fini
 # TLDR Responses
 
 When the user asks for a TLDR, answer the actual question in the first sentence. Additional context may follow, but the first sentence must contain the decision, conclusion, or requested fact.
+
+# Direct Capability Answers
+
+When the user asks whether Codex can do something, answer the exact requested outcome first. If any required part of the requested outcome cannot be done, the answer is `no`; do not reframe a partial workaround as `yes`, and do not add excuse-like context before the direct answer.
