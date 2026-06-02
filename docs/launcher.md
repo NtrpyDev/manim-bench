@@ -19,7 +19,7 @@ The launcher asks for:
 
 It then runs the benchmark and generates the report automatically.
 
-Each selected model needs a directory containing one Python file per V0.5 task ID:
+Each selected model needs a directory containing one Python file per V0.6 task ID:
 
 ```text
 outputs/my-model/

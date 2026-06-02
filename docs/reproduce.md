@@ -6,8 +6,9 @@ Install the engine:
 python -m pip install -e ".[dev]"
 ```
 
-Use the recorded suite path from `runs/<run_id>/manifest.json`. V0.5 is the
-default, and V0.4 remains available by passing `--suite benchmarks/v0.4/suite.yaml`.
+Use the recorded suite path from `runs/<run_id>/manifest.json`. V0.6 is the
+default, and earlier suites remain available by passing an explicit `--suite`
+path.
 
 Generate or place one solution per task:
 

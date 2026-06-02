@@ -1,7 +1,7 @@
 # Auto Comparison
 
 `run_comparison.py` is for generated `model_tests/<model>/outputs` folders. It
-is optional; the main V0.5 path is `python start_benchmark.py` or
+is optional; the main V0.6 path is `python start_benchmark.py` or
 `manimbench run-file-matrix --model-output model=outputs/model`.
 
 After model workspaces contain generated `outputs/*.py`, run:
@@ -12,7 +12,7 @@ python run_comparison.py
 ```
 
 This scans `model_tests/*/outputs` and includes models that have every selected
-V0.5 task output.
+V0.6 task output.
 
 Useful options:
 

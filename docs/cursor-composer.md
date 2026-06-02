@@ -51,7 +51,7 @@ The engine writes one generated file per task under:
 outputs/composer-2-5/<task_id>.py
 ```
 
-It still applies normal v0.5a safety behavior: completed files are skipped
+It still applies normal v0.6 safety behavior: completed files are skipped
 unless `--force` is passed, checkpoint state is stored under
 `.manimbench/runs/<run_id>/state.json`, and call records are appended to
 `.manimbench/runs/<run_id>/generation.log`.

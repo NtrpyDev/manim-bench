@@ -32,9 +32,9 @@ cd manimbench
 python collect_usage.py
 ```
 
-The default is V0.5 suite-scoped accounting, so it counts the six default
+The default is V0.6 suite-scoped accounting, so it counts the six default
 `tasks/<task_id>.md` prompts and matching `outputs/<task_id>.py` files. To
-backfill V0.4 or V0.3 folders, pass the suite explicitly:
+backfill earlier suite folders, pass the suite explicitly:
 
 ```bash
 python collect_usage.py --suite benchmarks/v0.4/suite.yaml

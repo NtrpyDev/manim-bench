@@ -1,6 +1,6 @@
 # Public Suite
 
-The default public ManimBench suite is `benchmarks/v0.5/suite.yaml`.
+The default public ManimBench suite is `benchmarks/v0.6/suite.yaml`.
 
 It contains six focused tasks:
 
@@ -34,8 +34,8 @@ manimbench run-file-matrix \
   --model-output model-b=outputs/model-b \
   --sandbox container \
   --parallel 2 \
-  --run-id v05-comparison
-manimbench report --run-dir runs/v05-comparison
+  --run-id v06-comparison
+manimbench report --run-dir runs/v06-comparison
 ```
 
 Local sandbox runs are useful for debugging but are marked `official: false`.

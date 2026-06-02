@@ -1,6 +1,6 @@
 # OpenRouter
 
-OpenRouter is the default API gateway for public v0.5a model generation when
+OpenRouter is the default API gateway for public v0.6 model generation when
 the model is published in OpenRouter's catalog. `composer-2-5` is the exception:
 OpenRouter does not currently publish a Cursor Composer slug, so ManimBench
 routes actual Composer 2.5 generation through Cursor Agent CLI.

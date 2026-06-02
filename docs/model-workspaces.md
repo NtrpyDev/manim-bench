@@ -1,6 +1,6 @@
 # Model Workspaces
 
-The canonical V0.5 input format is a plain file-backed output directory:
+The canonical V0.6 input format is a plain file-backed output directory:
 
 ```text
 outputs/<model>/

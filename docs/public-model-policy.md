@@ -2,7 +2,7 @@
 
 Public leaderboard models live in `models/public.yaml`.
 
-Rules for v0.5a:
+Rules for v0.6:
 
 - Public API models should be routable through OpenRouter when OpenRouter
   publishes an official slug.

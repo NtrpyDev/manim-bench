@@ -1,6 +1,6 @@
 # Providers
 
-ManimBench v0.5a has two provider paths:
+ManimBench v0.6 has three provider paths:
 
 - `auto` is the default. It routes most public models through OpenRouter and
   routes `composer-2-5` through Cursor Agent CLI.
