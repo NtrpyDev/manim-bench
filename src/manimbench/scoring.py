@@ -25,9 +25,27 @@ except Exception:  # pragma: no cover - exercised only in stripped envs.
 from manimbench.models import RenderResult, ScoreResult, Task
 
 
-SCORING_VERSION = "0.5.0"
+SCORING_VERSION = "0.6.0"
 TEXT_CALLS = {"Text", "Tex", "MathTex", "MarkupText", "Paragraph", "Title"}
 STATIC_ASSET_CALLS = {"ImageMobject", "SVGMobject", "VideoMobject", "open", "Image.open"}
+HARD_GATE_CHECKS = {
+    "source_parse",
+    "scene_class",
+    "forbidden_imports",
+    "required_labels_in_source",
+    "minimum_required_labels",
+    "required_sections",
+    "suspicious_source_patterns",
+    "render_exit_code",
+    "render_not_timed_out",
+    "media_generated",
+    "fps",
+    "duration",
+    "visual_sanity",
+    "layout_probe",
+}
+ADVISORY_CHECKS = {"required_source_terms"}
+PASS_THRESHOLD = 70.0
 
 
 @dataclass
@@ -94,7 +112,9 @@ def score_task(
     passed_count = sum(1 for value in flattened if value)
     raw_score = round(100.0 * passed_count / max(len(flattened), 1), 2)
     automated_score = _apply_score_caps(raw_score, checks)
-    passed = all(flattened) and automated_score >= 70.0
+    pass_gate = _pass_gate_summary(checks, automated_score)
+    passed = bool(pass_gate["passed"])
+    failure_category = "pass" if passed else _failure_category(checks, pass_gate)
 
     artifacts = {
         "solution": "solution.py",
@@ -113,6 +133,9 @@ def score_task(
         checks=checks,
         rubric=_human_review_template(task),
         artifacts={key: str(run_dir / value) for key, value in artifacts.items()},
+        rank_score=automated_score,
+        pass_gate=pass_gate,
+        failure_category=failure_category,
     )
 
 
@@ -124,7 +147,7 @@ def result_payload(
     score: ScoreResult,
 ) -> dict[str, Any]:
     return {
-        "schema_version": "0.1.0",
+        "schema_version": "0.6.0",
         "scoring_version": SCORING_VERSION,
         "model": model,
         "task": {
@@ -274,19 +297,27 @@ def _suspicious_source_check(source: str, analysis: SourceAnalysis, task: Task) 
         findings.append("empty_or_inactive_scene")
     if any(_structural_match(analysis, term) for term in STATIC_ASSET_CALLS):
         findings.append("static_or_external_asset_dependency")
-    if _has_unused_keyword_stuffing(analysis, task.automated_checks.get("required_source_terms", [])):
+    if _has_unused_keyword_stuffing(analysis, task.automated_checks.get("required_source_terms", []), task):
         findings.append("unused_keyword_stuffing")
     if any(marker in lower_source for marker in ["random.", "np.random", "numpy.random"]):
         findings.append("randomized_output")
     return {"passed": not findings, "findings": findings}
 
 
-def _has_unused_keyword_stuffing(analysis: SourceAnalysis, terms: list[str]) -> bool:
+def _has_unused_keyword_stuffing(analysis: SourceAnalysis, terms: list[str], task: Task) -> bool:
     normalized_strings = _normalize_label(" ".join(analysis.all_string_literals))
+    normalized_visible = [_normalize_label(value) for value in analysis.visible_text_literals]
     for term in terms:
         if _structural_match(analysis, str(term)):
             continue
-        if _normalize_label(str(term)) in normalized_strings:
+        normalized = _normalize_label(str(term))
+        visible_required_label = any(
+            normalized == _normalize_label(label) and any(normalized in literal for literal in normalized_visible)
+            for label in task.required_labels
+        )
+        if visible_required_label:
+            continue
+        if normalized in normalized_strings:
             return True
     return False
 
@@ -742,6 +773,92 @@ def _apply_score_caps(raw_score: float, checks: dict[str, Any]) -> float:
     if "label_overlaps" in layout_findings:
         cap = min(cap, 76.0)
     return round(min(raw_score, cap), 2)
+
+
+def _pass_gate_summary(checks: dict[str, Any], automated_score: float) -> dict[str, Any]:
+    failed_hard = _failed_check_names(checks, HARD_GATE_CHECKS)
+    failed_advisory = _failed_check_names(checks, ADVISORY_CHECKS)
+    threshold_passed = automated_score >= PASS_THRESHOLD
+    return {
+        "schema_version": "0.6.0",
+        "passed": not failed_hard and threshold_passed,
+        "threshold": PASS_THRESHOLD,
+        "score_passed": threshold_passed,
+        "hard_checks": sorted(HARD_GATE_CHECKS),
+        "advisory_checks": sorted(ADVISORY_CHECKS),
+        "failed_hard_checks": failed_hard,
+        "failed_advisory_checks": failed_advisory,
+        "policy": "v0.6 ranks by automated score and gates only required output, render, safety, label, timing, and visual checks. Required source terms remain scored advisory evidence.",
+    }
+
+
+def _failed_check_names(checks: dict[str, Any], names: set[str]) -> list[str]:
+    failed: list[str] = []
+    for name in sorted(names):
+        if name not in checks:
+            continue
+        failed.extend(_failed_check_paths(name, checks[name]))
+    return failed
+
+
+def _failed_check_paths(prefix: str, value: Any) -> list[str]:
+    if isinstance(value, bool):
+        return [] if value else [prefix]
+    if isinstance(value, dict):
+        if "passed" in value:
+            if bool(value["passed"]):
+                return []
+            if prefix == "required_source_terms":
+                matches = value.get("matches", {})
+                if isinstance(matches, dict):
+                    missing = [str(term) for term, matched in matches.items() if not matched]
+                    if missing:
+                        return [f"{prefix}.{term}" for term in missing]
+            return [prefix]
+        failed: list[str] = []
+        for key, item in value.items():
+            if isinstance(item, bool) and not item:
+                failed.append(f"{prefix}.{key}")
+        return failed
+    return []
+
+
+def _failure_category(checks: dict[str, Any], pass_gate: dict[str, Any]) -> str:
+    failed_hard = set(pass_gate.get("failed_hard_checks", []))
+    if any(item.startswith("source_parse") for item in failed_hard):
+        return "source_parse"
+    if "scene_class" in failed_hard:
+        return "missing_scene_class"
+    if any(item.startswith("forbidden_imports") for item in failed_hard):
+        return "forbidden_import"
+    if any(item.startswith("render_not_timed_out") for item in failed_hard):
+        return "render_timeout"
+    if "render_exit_code" in failed_hard:
+        return "render_crash"
+    if "media_generated" in failed_hard:
+        return "no_media"
+    if any(item.startswith("required_labels_in_source") for item in failed_hard) or "minimum_required_labels" in failed_hard:
+        return "missing_required_labels"
+    if "required_sections" in failed_hard:
+        return "missing_required_sections"
+    if "suspicious_source_patterns" in failed_hard:
+        findings = set(checks.get("suspicious_source_patterns", {}).get("findings", []))
+        if "unused_keyword_stuffing" in findings:
+            return "keyword_stuffing"
+        if {"unimplemented_code", "empty_or_inactive_scene"} & findings:
+            return "inactive_or_stub_scene"
+        return "suspicious_source"
+    if "visual_sanity" in failed_hard:
+        return "visual_sanity"
+    if "layout_probe" in failed_hard:
+        return "layout_probe"
+    if "fps" in failed_hard:
+        return "fps"
+    if "duration" in failed_hard:
+        return "duration"
+    if not pass_gate.get("score_passed", True):
+        return "low_score"
+    return "hard_gate"
 
 
 def _flatten_checks(checks: dict[str, Any]) -> list[bool]:

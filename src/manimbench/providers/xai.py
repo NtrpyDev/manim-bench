@@ -4,10 +4,19 @@ from typing import Any
 
 from manimbench.model_registry import provider_config
 from manimbench.providers.common import ChatCompletionProvider
+from manimbench.reasoning import xai_reasoning_effort_for_model
 
 
 class XAIProvider(ChatCompletionProvider):
-    def __init__(self, model_id: str, model_slug: str | None = None, *, api_key: str | None = None, client: Any | None = None):
+    def __init__(
+        self,
+        model_id: str,
+        model_slug: str | None = None,
+        *,
+        api_key: str | None = None,
+        client: Any | None = None,
+        reasoning_effort: str | None = None,
+    ):
         config = provider_config("xai")
         super().__init__(
             provider_name="xai",
@@ -18,4 +27,10 @@ class XAIProvider(ChatCompletionProvider):
             base_url=str(config.get("base_url", "https://api.x.ai/v1")),
             api_key=api_key,
             client=client,
+            reasoning_effort=reasoning_effort,
         )
+
+    def _apply_reasoning_effort(self, payload: dict[str, Any]) -> None:
+        effort = xai_reasoning_effort_for_model(self.reasoning_effort)
+        if effort:
+            payload["reasoning_effort"] = effort

@@ -17,6 +17,7 @@ def test_report_generation(tmp_path):
             "model": "model-a",
             "passed": True,
             "automated_score": 87.5,
+            "rank_score": 91.0,
             "checks": {"render_exit_code": True, "media_generated": True},
             "rubric": {},
             "artifacts": {},
@@ -30,15 +31,48 @@ def test_report_generation(tmp_path):
 
     assert len(results) == 1
     assert summaries[0]["model"] == "model-a"
-    assert summaries[0]["avg_score"] == 87.5
+    assert summaries[0]["avg_score"] == 91.0
     assert index.exists()
-    assert "Overall ManimBench score" in index.read_text(encoding="utf-8")
+    assert "Capability score" in index.read_text(encoding="utf-8")
     assert "Efficiency ranking" in index.read_text(encoding="utf-8")
     assert "Final Share Videos" in index.read_text(encoding="utf-8")
     assert (tmp_path / "reports" / "demo" / "data" / "tasks.json").exists()
     assert (tmp_path / "reports" / "demo" / "data" / "leaderboard.json").exists()
     leaderboard = json.loads((tmp_path / "reports" / "demo" / "data" / "leaderboard.json").read_text(encoding="utf-8"))
-    assert leaderboard["schema_version"] == "0.5.0"
+    assert leaderboard["schema_version"] == "0.6.0"
+    assert leaderboard["scoring_policy"]["primary_rank_field"] == "score"
+    assert leaderboard["models"][0]["score"] == 91.0
     assert (tmp_path / "reports" / "demo" / "report.md").exists()
     assert (tmp_path / "reports" / "demo" / "models" / "model-a.html").exists()
     assert (tmp_path / "reports" / "demo" / "tasks" / "task-a.html").exists()
+
+
+def test_report_summarizes_failure_buckets(tmp_path):
+    run_dir = tmp_path / "runs" / "demo"
+    for task_id, category in [("task-a", "render_crash"), ("task-b", "missing_source")]:
+        task_dir = run_dir / "model-a" / task_id
+        task_dir.mkdir(parents=True)
+        payload = {
+            "schema_version": "0.6.0",
+            "model": "model-a",
+            "task": {"id": task_id, "version": "1.0", "difficulty": "easy", "domains": [], "title": task_id},
+            "source_metadata": {},
+            "score": {
+                "task_id": task_id,
+                "model": "model-a",
+                "passed": False,
+                "automated_score": 0,
+                "rank_score": 0,
+                "failure_category": category,
+                "checks": {"render_exit_code": category != "render_crash", "media_generated": False},
+                "rubric": {},
+                "artifacts": {},
+            },
+        }
+        (task_dir / "result.json").write_text(json.dumps(payload), encoding="utf-8")
+
+    summary = summarize_models(load_results(run_dir))[0]
+
+    assert summary["failure_buckets"] == {"missing_source": 1, "render_crash": 1}
+    assert summary["coverage_rate"] == 50.0
+    assert summary["render_success_rate"] == 0.0

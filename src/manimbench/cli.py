@@ -28,6 +28,7 @@ from manimbench.paths import (
     DEFAULT_SUITE_PATH,
 )
 from manimbench.prompting import build_task_prompt, load_master_prompt
+from manimbench.reasoning import REASONING_EFFORT_CHOICES
 from manimbench.reporting import load_results, summarize_models
 from manimbench.tasks import load_suite
 
@@ -45,7 +46,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="manimbench")
     parser.add_argument("--suite", type=Path, default=DEFAULT_SUITE_PATH)
     parser.add_argument("--prompt", type=Path, default=DEFAULT_PROMPT_PATH)
-    subparsers = parser.add_subparsers(required=True)
+    parser.set_defaults(func=cmd_start)
+    subparsers = parser.add_subparsers(required=False)
 
     start = subparsers.add_parser("start", help="Launch an interactive benchmark runner.")
     start.set_defaults(func=cmd_start)
@@ -53,6 +55,14 @@ def build_parser() -> argparse.ArgumentParser:
     list_models_cmd = subparsers.add_parser("list-models", help="List configured benchmark models.")
     list_models_cmd.add_argument("--public", action="store_true", help="Only list public models.")
     list_models_cmd.set_defaults(func=cmd_list_models)
+
+    check_models = subparsers.add_parser("check-models", help="Check OpenRouter for newly available models.")
+    check_models.add_argument("--force", action="store_true", help="Fetch even if the daily check is still fresh.")
+    check_models.add_argument("--apply", action="store_true", help="Add newly detected models to local registry YAML.")
+    check_models.add_argument("--interval-hours", type=int, default=24, help="Freshness window for non-forced checks.")
+    check_models.add_argument("--show-unregistered", action="store_true", help="Also list live OpenRouter models not in this registry.")
+    check_models.add_argument("--limit", type=int, default=25, help="Maximum models to print per section.")
+    check_models.set_defaults(func=cmd_check_models)
 
     workspaces = subparsers.add_parser("create-workspaces", help="Create file-backed model workspaces.")
     workspaces.add_argument("--model", action="append", help="Model ID to create. Repeat for multiple models.")
@@ -132,6 +142,7 @@ def build_parser() -> argparse.ArgumentParser:
     generate_cmd.add_argument("--force", action="store_true")
     generate_cmd.add_argument("--smoke", action="store_true")
     generate_cmd.add_argument("--run-id")
+    generate_cmd.add_argument("--reasoning-effort", choices=REASONING_EFFORT_CHOICES, default="default")
     generate_cmd.set_defaults(func=cmd_generate)
 
     batch_cmd = subparsers.add_parser("generate-batch", help="Generate outputs for multiple API-backed models.")
@@ -144,6 +155,7 @@ def build_parser() -> argparse.ArgumentParser:
     batch_cmd.add_argument("--force", action="store_true")
     batch_cmd.add_argument("--smoke", action="store_true")
     batch_cmd.add_argument("--run-id")
+    batch_cmd.add_argument("--reasoning-effort", choices=REASONING_EFFORT_CHOICES, default="default")
     batch_cmd.set_defaults(func=cmd_generate_batch)
 
     run = subparsers.add_parser("run", help="Run a benchmark for one file-backed model.")
@@ -206,14 +218,44 @@ def _add_render_args(parser: argparse.ArgumentParser, include_tasks: bool = True
 
 
 def cmd_start(args: argparse.Namespace) -> int:
-    from manimbench.wizard import start_wizard
+    from manimbench.tui import launch
 
-    return start_wizard(args)
+    return launch()
 
 
 def cmd_list_models(args: argparse.Namespace) -> int:
     for row in list_models(public=True):
         print(f"{row['id']}\t{row['display_name']}\t{row.get('default_provider') or ''}\t{row.get('openrouter_slug') or ''}")
+    return 0
+
+
+def cmd_check_models(args: argparse.Namespace) -> int:
+    from manimbench.model_sync import check_openrouter_models
+
+    result = check_openrouter_models(
+        force=args.force,
+        apply_updates=args.apply,
+        interval_hours=args.interval_hours,
+        include_unregistered=args.show_unregistered,
+    )
+    if result.error:
+        print(f"OpenRouter model check failed: {result.error}")
+        return 1
+    status = "cached" if result.skipped else "checked"
+    print(f"OpenRouter model catalog {status} at {result.checked_at or 'unknown'}")
+    print(f"State: {result.state_path}")
+    if result.new_models:
+        print(f"New models since last check: {len(result.new_models)}")
+        _print_model_candidates(result.new_models, limit=args.limit)
+        if result.applied:
+            print(f"Applied {len(result.new_models)} model(s) to models/openrouter.yaml and models/public.yaml")
+        else:
+            print("Run `manimbench check-models --apply` to add these models to the local registry.")
+    else:
+        print("New models since last check: 0")
+    if args.show_unregistered:
+        print(f"Live OpenRouter models not in local registry: {len(result.unregistered_models)}")
+        _print_model_candidates(result.unregistered_models, limit=args.limit)
     return 0
 
 
@@ -273,6 +315,15 @@ def cmd_list_tasks(args: argparse.Namespace) -> int:
     return 0
 
 
+def _print_model_candidates(candidates, *, limit: int) -> None:
+    for candidate in candidates[: max(0, limit)]:
+        input_rate = candidate.pricing.get("input_usd_per_1m_tokens", "?")
+        output_rate = candidate.pricing.get("output_usd_per_1m_tokens", "?")
+        print(f"  {candidate.id}\t{candidate.display_name}\t{candidate.openrouter_slug}\t${input_rate}/${output_rate} MTok")
+    if len(candidates) > limit:
+        print(f"  ... {len(candidates) - limit} more")
+
+
 def cmd_write_prompts(args: argparse.Namespace) -> int:
     suite = load_suite(args.suite)
     master_prompt = load_master_prompt(args.prompt)
@@ -296,6 +347,7 @@ def cmd_generate(args: argparse.Namespace) -> int:
             smoke=args.smoke,
             parallel=args.parallel,
             run_id=args.run_id,
+            reasoning_effort=args.reasoning_effort,
         )
     )
     _print_generation_result(result)
@@ -316,6 +368,7 @@ def cmd_generate_batch(args: argparse.Namespace) -> int:
             dry_run=args.dry_run,
             parallel=args.parallel,
             run_id=args.run_id,
+            reasoning_effort=args.reasoning_effort,
         )
     )
     _print_generation_result(result)

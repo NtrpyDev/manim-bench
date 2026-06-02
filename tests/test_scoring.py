@@ -49,7 +49,42 @@ class MainScene(Scene):
 
     assert not score.checks["required_source_terms"]["matches"]["Circle"]
     assert "unused_keyword_stuffing" in score.checks["suspicious_source_patterns"]["findings"]
+    assert not score.passed
     assert score.automated_score <= 70
+
+
+def test_source_terms_are_advisory_when_animation_otherwise_passes(tmp_path):
+    task = load_suite(V04_SUITE_PATH).tasks[0]
+    source = """from manim import *
+
+class MainScene(Scene):
+    def construct(self):
+        title = Text("Basic Manim control")
+        labels = VGroup(
+            Text("Circle"),
+            Text("Square"),
+            Text("Triangle"),
+            Text("Arrow"),
+            Text("Transform"),
+            Text("timeline"),
+            MathTex("scale = 2"),
+        )
+        circle = Circle()
+        square = Square()
+        triangle = Triangle()
+        arrow = Arrow()
+        self.add(title, labels, circle, square, triangle, arrow)
+        self.play(Create(circle), Create(square), Create(triangle), Create(arrow))
+"""
+    render = _successful_render(tmp_path)
+
+    score = score_task(task, "model-a", source, render, tmp_path)
+
+    assert not score.checks["required_source_terms"]["matches"]["Transform"]
+    assert "required_source_terms.Transform" in score.pass_gate["failed_advisory_checks"]
+    assert not score.pass_gate["failed_hard_checks"]
+    assert score.passed
+    assert score.failure_category == "pass"
 
 
 def test_placeholder_stub_scene_is_capped(tmp_path):

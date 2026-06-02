@@ -1,4 +1,4 @@
-from manimbench.cli import build_parser
+from manimbench.cli import build_parser, main
 
 
 def test_cli_exposes_planned_commands():
@@ -7,6 +7,7 @@ def test_cli_exposes_planned_commands():
     assert parser.parse_args(["list-tasks"]).func.__name__ == "cmd_list_tasks"
     assert parser.parse_args(["start"]).func.__name__ == "cmd_start"
     assert parser.parse_args(["list-models"]).func.__name__ == "cmd_list_models"
+    assert parser.parse_args(["check-models", "--force", "--show-unregistered"]).func.__name__ == "cmd_check_models"
     assert parser.parse_args(["create-workspaces"]).func.__name__ == "cmd_create_workspaces"
     assert parser.parse_args(["usage-start"]).func.__name__ == "cmd_usage_start"
     assert parser.parse_args(["usage-finish"]).func.__name__ == "cmd_usage_finish"
@@ -20,6 +21,14 @@ def test_cli_exposes_planned_commands():
     assert (
         parser.parse_args(["generate", "--model", "composer-2-5", "--provider", "cursor"]).provider
         == "cursor"
+    )
+    assert (
+        parser.parse_args(["generate", "--model", "gpt-5-5", "--reasoning-effort", "xhigh"]).reasoning_effort
+        == "xhigh"
+    )
+    assert (
+        parser.parse_args(["generate-batch", "--models", "opus-4-8", "--reasoning-effort", "max"]).reasoning_effort
+        == "max"
     )
     assert parser.parse_args(["generate-batch", "--models", "composer-2-5,gpt-5-5"]).func.__name__ == "cmd_generate_batch"
     assert parser.parse_args(["publish", "--run-dir", "runs/demo", "--target", "draft"]).func.__name__ == "cmd_publish"
@@ -62,3 +71,11 @@ def test_cli_exposes_planned_commands():
         ).func.__name__
         == "cmd_rerun_failed"
     )
+
+
+def test_cli_no_args_launches_tui(monkeypatch):
+    import manimbench.tui
+
+    monkeypatch.setattr(manimbench.tui, "launch", lambda: 17)
+
+    assert main([]) == 17

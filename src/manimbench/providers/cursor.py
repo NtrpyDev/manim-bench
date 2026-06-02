@@ -56,6 +56,7 @@ class CursorProvider:
         command = [
             self.command,
             "-p",
+            "--trust",
             "--output-format",
             "text",
             "--model",

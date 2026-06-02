@@ -2,12 +2,18 @@ from __future__ import annotations
 
 import html
 import json
-from collections import defaultdict
+from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Any
 
 from manimbench.paths import PROJECT_ROOT
 from manimbench.visual_review import merge_review
+
+REPORT_SCHEMA_VERSION = "0.6.0"
+SCORING_POLICY_SUMMARY = (
+    "v0.6 ranks models by capability score while publishing pass rate, coverage, render success, "
+    "and failure buckets separately. Required source terms are advisory score evidence, not a hard pass gate."
+)
 
 
 def load_results(run_dir: Path) -> list[dict[str, Any]]:
@@ -24,13 +30,15 @@ def summarize_models(results: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
     summaries = []
     for model, model_results in grouped.items():
-        scores = [float(item["score"]["automated_score"]) for item in model_results]
+        scores = [_rank_score(item) for item in model_results]
+        automated_scores = [float(item["score"]["automated_score"]) for item in model_results]
         adjusted_scores = [
             float(item["score"]["adjusted_visual_score"])
             for item in model_results
             if item.get("score", {}).get("adjusted_visual_score") is not None
         ]
         passed = [bool(item["score"]["passed"]) for item in model_results]
+        failure_buckets = _failure_buckets(model_results)
         times = [_metadata_number(item, "elapsed_seconds") for item in model_results]
         costs = [_metadata_number(item, "cost_usd") for item in model_results]
         input_tokens = [_metadata_number(item, "input_tokens") for item in model_results]
@@ -42,6 +50,7 @@ def summarize_models(results: list[dict[str, Any]]) -> list[dict[str, Any]]:
             for item in model_results
         ]
         avg_score = sum(scores) / max(len(scores), 1)
+        avg_automated_score = sum(automated_scores) / max(len(automated_scores), 1)
         avg_cost = _average([value for value in costs if value is not None])
         avg_time = _average([value for value in times if value is not None])
         avg_input_tokens = _average([value for value in input_tokens if value is not None])
@@ -53,8 +62,11 @@ def summarize_models(results: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "tasks": len(model_results),
                 "pass_rate": 100.0 * sum(passed) / max(len(passed), 1),
                 "render_success_rate": 100.0 * sum(render_success) / max(len(render_success), 1),
+                "coverage_rate": 100.0 * (len(model_results) - failure_buckets.get("missing_source", 0)) / max(len(model_results), 1),
                 "avg_score": avg_score,
+                "avg_automated_score": avg_automated_score,
                 "avg_adjusted_visual_score": _average(adjusted_scores),
+                "failure_buckets": dict(sorted(failure_buckets.items())),
                 "review_status": _model_review_status(model_results),
                 "avg_cost_usd": avg_cost,
                 "avg_time_seconds": avg_time,
@@ -96,6 +108,60 @@ def _model_review_status(results: list[dict[str, Any]]) -> str:
     return "pending"
 
 
+def _rank_score(result: dict[str, Any]) -> float:
+    score = result.get("score", {}) if isinstance(result.get("score"), dict) else {}
+    value = score.get("rank_score", score.get("automated_score", 0))
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return 0.0
+
+
+def _failure_buckets(results: list[dict[str, Any]]) -> Counter[str]:
+    buckets: Counter[str] = Counter()
+    for result in results:
+        category = _result_failure_category(result)
+        if category != "pass":
+            buckets[category] += 1
+    return buckets
+
+
+def _result_failure_category(result: dict[str, Any]) -> str:
+    score = result.get("score", {}) if isinstance(result.get("score"), dict) else {}
+    if score.get("passed"):
+        return "pass"
+    category = score.get("failure_category")
+    if isinstance(category, str) and category:
+        return category
+    error = str(result.get("error") or "")
+    if "Missing file-provider output" in error:
+        return "missing_source"
+    checks = score.get("checks", {}) if isinstance(score.get("checks"), dict) else {}
+    if checks.get("generation") is False:
+        return "missing_source"
+    if checks.get("render_not_timed_out") is False:
+        return "render_timeout"
+    if checks.get("render_exit_code") is False:
+        return "render_crash"
+    if checks.get("media_generated") is False:
+        return "no_media"
+    if _passed_field_failed(checks.get("required_source_terms")):
+        return "source_terms"
+    if _passed_field_failed(checks.get("minimum_required_labels")):
+        return "missing_required_labels"
+    if _passed_field_failed(checks.get("required_sections")):
+        return "missing_required_sections"
+    if _passed_field_failed(checks.get("visual_sanity")):
+        return "visual_sanity"
+    if _passed_field_failed(checks.get("suspicious_source_patterns")):
+        return "suspicious_source"
+    return "score_gate"
+
+
+def _passed_field_failed(value: Any) -> bool:
+    return isinstance(value, dict) and value.get("passed") is False
+
+
 def summarize_tasks(results: list[dict[str, Any]]) -> list[dict[str, Any]]:
     grouped: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for result in results:
@@ -103,9 +169,10 @@ def summarize_tasks(results: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
     summaries = []
     for task_id, task_results in grouped.items():
-        scores = [float(item["score"]["automated_score"]) for item in task_results]
+        scores = [_rank_score(item) for item in task_results]
         passed = [bool(item["score"]["passed"]) for item in task_results]
         task = task_results[0].get("task", {})
+        failure_buckets = _failure_buckets(task_results)
         summaries.append(
             {
                 "task_id": task_id,
@@ -115,6 +182,7 @@ def summarize_tasks(results: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "models": len(task_results),
                 "avg_score": sum(scores) / max(len(scores), 1),
                 "pass_rate": 100.0 * sum(passed) / max(len(passed), 1),
+                "failure_buckets": dict(sorted(failure_buckets.items())),
             }
         )
     return sorted(summaries, key=lambda item: (item["difficulty"], item["task_id"]))
@@ -162,7 +230,12 @@ def _leaderboard_payload(
                 "rank": rank,
                 "model": summary["model"],
                 "score": summary["avg_score"],
+                "automated_score": summary.get("avg_automated_score"),
                 "adjusted_visual_score": summary.get("avg_adjusted_visual_score"),
+                "pass_rate": summary.get("pass_rate"),
+                "coverage_rate": summary.get("coverage_rate"),
+                "render_success_rate": summary.get("render_success_rate"),
+                "failure_buckets": summary.get("failure_buckets", {}),
                 "review_status": summary.get("review_status", "pending"),
                 "video_path": video.get("relative_output"),
                 "thumbnail_path": video.get("relative_thumbnail"),
@@ -177,9 +250,15 @@ def _leaderboard_payload(
             }
         )
     return {
-        "schema_version": "0.5.0",
+        "schema_version": REPORT_SCHEMA_VERSION,
         "run_id": manifest.get("run_id", run_dir.name),
         "suite": manifest.get("suite", {}),
+        "scoring_policy": {
+            "version": REPORT_SCHEMA_VERSION,
+            "summary": SCORING_POLICY_SUMMARY,
+            "primary_rank_field": "score",
+            "separate_fields": ["pass_rate", "coverage_rate", "render_success_rate", "failure_buckets"],
+        },
         "models": entries,
     }
 
@@ -199,7 +278,7 @@ def _render_html(run_dir: Path, output_dir: Path, results: list[dict[str, Any]],
     model_count = len(summaries)
     task_count = len({item["task"]["id"] for item in results})
     best_score = max((item["avg_score"] for item in summaries), default=0)
-    overall_chart = _ranking_chart(summaries, "avg_score", "Overall ManimBench score", "%")
+    overall_chart = _ranking_chart(summaries, "avg_score", "Capability score", "%")
     efficiency_chart = _ranking_chart(
         sorted(summaries, key=lambda item: item["efficiency_score"], reverse=True),
         "efficiency_score",
@@ -288,11 +367,11 @@ def _render_html(run_dir: Path, output_dir: Path, results: list[dict[str, Any]],
     </nav>
     <section class="hero">
       <h1>ManimBench</h1>
-      <p>Ranking AI models on ManimCE animation generation, mathematical reasoning, visual clarity, and reproducible sandboxed rendering.</p>
+      <p>Ranking AI models on ManimCE animation generation with v0.6 scoring: capability score is primary, while coverage, render success, pass rate, and failure buckets stay visible as separate evidence.</p>
       <div class="stats">
         <div class="stat"><strong>{model_count}</strong><span>models</span></div>
         <div class="stat"><strong>{task_count}</strong><span>tasks</span></div>
-        <div class="stat"><strong>{best_score:.1f}%</strong><span>top automated score</span></div>
+        <div class="stat"><strong>{best_score:.1f}%</strong><span>top capability score</span></div>
         <div class="stat"><strong>{html.escape(run_dir.name)}</strong><span>run id</span></div>
       </div>
     </section>
@@ -394,16 +473,19 @@ def _render_markdown(run_dir: Path, summaries: list[dict[str, Any]], task_summar
         "",
         f"Run: `{run_dir.name}`",
         "",
+        f"Scoring policy: {SCORING_POLICY_SUMMARY}",
+        "",
         "## Model Ranking",
         "",
-        "| Rank | Model | Score | Pass@1 | Render | Avg cost | Avg time | Out tok |",
-        "|---:|---|---:|---:|---:|---:|---:|---:|",
+        "| Rank | Model | Score | Pass@1 | Coverage | Render | Failures | Avg cost | Avg time |",
+        "|---:|---|---:|---:|---:|---:|---|---:|---:|",
     ]
     for rank, item in enumerate(summaries, start=1):
         lines.append(
             f"| {rank} | {item['model']} | {item['avg_score']:.1f}% | {item['pass_rate']:.1f}% | "
-            f"{item['render_success_rate']:.1f}% | {_format_money(item['avg_cost_usd'])} | "
-            f"{_format_seconds(item['avg_time_seconds'])} | {_format_number(item['avg_output_tokens'])} |"
+            f"{item['coverage_rate']:.1f}% | {item['render_success_rate']:.1f}% | "
+            f"{_format_failure_mix(item.get('failure_buckets', {}))} | {_format_money(item['avg_cost_usd'])} | "
+            f"{_format_seconds(item['avg_time_seconds'])} |"
         )
 
     lines.extend(
@@ -411,14 +493,14 @@ def _render_markdown(run_dir: Path, summaries: list[dict[str, Any]], task_summar
             "",
             "## Task Summary",
             "",
-            "| Task | Difficulty | Models | Score | Pass rate |",
-            "|---|---|---:|---:|---:|",
+            "| Task | Difficulty | Models | Score | Pass rate | Failures |",
+            "|---|---|---:|---:|---:|---|",
         ]
     )
     for item in task_summaries:
         lines.append(
             f"| {item['task_id']} | {item['difficulty']} | {item['models']} | "
-            f"{item['avg_score']:.1f}% | {item['pass_rate']:.1f}% |"
+            f"{item['avg_score']:.1f}% | {item['pass_rate']:.1f}% | {_format_failure_mix(item.get('failure_buckets', {}))} |"
         )
     lines.append("")
     return "\n".join(lines)
@@ -448,15 +530,16 @@ def _model_table(summaries: list[dict[str, Any]]) -> str:
             f"<td>{rank}. {html.escape(item['model'])}</td>"
             f"<td>{item['avg_score']:.1f}%</td>"
             f"<td>{item['pass_rate']:.1f}%</td>"
+            f"<td>{item['coverage_rate']:.1f}%</td>"
             f"<td>{item['render_success_rate']:.1f}%</td>"
+            f"<td>{html.escape(_format_failure_mix(item.get('failure_buckets', {})))}</td>"
             f"<td>{_format_money(item['avg_cost_usd'])}</td>"
             f"<td>{_format_seconds(item['avg_time_seconds'])}</td>"
-            f"<td>{_format_number(item['avg_output_tokens'])}</td>"
             "</tr>"
         )
     return (
-        "<table><thead><tr><th>Model</th><th>Score</th><th>Pass@1</th><th>Render</th>"
-        "<th>Avg cost</th><th>Avg time</th><th>Out tok</th></tr></thead><tbody>"
+        "<table><thead><tr><th>Model</th><th>Score</th><th>Pass@1</th><th>Coverage</th><th>Render</th>"
+        "<th>Failure mix</th><th>Avg cost</th><th>Avg time</th></tr></thead><tbody>"
         + "".join(rows)
         + "</tbody></table>"
     )
@@ -476,7 +559,7 @@ def _final_video_grid(output_dir: Path, summaries: list[dict[str, Any]]) -> str:
             f"""<div class="video-card">
   <video controls preload="metadata" src="{html.escape(str(relative))}"{poster}></video>
   <h3>{html.escape(item['model'])}</h3>
-  <p>Score {item['avg_score']:.1f}% · Review {html.escape(str(item.get('review_status', 'pending')))} · Cost {_format_money(item['avg_cost_usd'])} · Time {_format_seconds(item['avg_time_seconds'])}</p>
+  <p>Score {item['avg_score']:.1f}% · Pass {item['pass_rate']:.1f}% · Review {html.escape(str(item.get('review_status', 'pending')))} · Cost {_format_money(item['avg_cost_usd'])} · Time {_format_seconds(item['avg_time_seconds'])}</p>
 </div>"""
         )
     if not cards:
@@ -487,12 +570,12 @@ def _final_video_grid(output_dir: Path, summaries: list[dict[str, Any]]) -> str:
 def _task_cards(results: list[dict[str, Any]]) -> str:
     cards = []
     for result in results:
-        status = "pass" if result["score"]["passed"] else "fail"
+        status = "pass" if result["score"]["passed"] else _result_failure_category(result)
         task = result.get("task", {})
         cards.append(
             f"""<div class="card">
   <h3>{html.escape(task.get('title') or task.get('id') or 'Unknown task')}</h3>
-  <p>{html.escape(result.get('model', 'unknown'))} · {html.escape(task.get('difficulty', 'unknown'))} · {status} · visual {_result_visual_status(result)} · {float(result['score']['automated_score']):.1f}%</p>
+  <p>{html.escape(result.get('model', 'unknown'))} · {html.escape(task.get('difficulty', 'unknown'))} · {html.escape(status)} · visual {_result_visual_status(result)} · {_rank_score(result):.1f}%</p>
 </div>"""
         )
     return "".join(cards) or "<p>No task results yet.</p>"
@@ -566,6 +649,13 @@ def _format_number(value: float | None) -> str:
     if value >= 1000:
         return f"{value / 1000:.1f}k"
     return f"{value:.0f}"
+
+
+def _format_failure_mix(value: Any) -> str:
+    if not isinstance(value, dict) or not value:
+        return "-"
+    ranked = sorted(((str(key), int(count)) for key, count in value.items()), key=lambda item: (-item[1], item[0]))
+    return ", ".join(f"{key} {count}" for key, count in ranked[:3])
 
 
 def _slug(value: str) -> str:

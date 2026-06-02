@@ -15,6 +15,7 @@ from manimbench.providers.common import (
     system_prompt,
     validate_main_scene,
 )
+from manimbench.reasoning import google_thinking_config_for_model, stored_reasoning_effort
 
 
 class GoogleProvider:
@@ -26,6 +27,7 @@ class GoogleProvider:
         api_key: str | None = None,
         client: Any | None = None,
         timeout_seconds: int = 240,
+        reasoning_effort: str | None = None,
     ):
         config = provider_config("google")
         self.provider_name = "google"
@@ -37,18 +39,23 @@ class GoogleProvider:
         self.api_key = api_key or os.getenv(self.api_key_env)
         self.client = client or HttpJsonClient()
         self.timeout_seconds = timeout_seconds
+        self.reasoning_effort = stored_reasoning_effort(reasoning_effort)
         if not self.api_key:
             raise ProviderError(f"{self.api_key_env} is required for provider {self.provider_name}")
 
     def generate(self, task: Task, prompt: str) -> ModelOutput:
         started = time.monotonic()
+        generation_config: dict[str, Any] = {"temperature": 0.2}
+        thinking_config = google_thinking_config_for_model(self.model_slug, self.reasoning_effort)
+        if thinking_config:
+            generation_config["thinkingConfig"] = thinking_config
         response = self.client.post_json(
             f"{self.base_url}/models/{self.model_slug}:generateContent?key={self.api_key}",
             headers={"Content-Type": "application/json"},
             payload={
                 "systemInstruction": {"parts": [{"text": system_prompt()}]},
                 "contents": [{"role": "user", "parts": [{"text": prompt}]}],
-                "generationConfig": {"temperature": 0.2},
+                "generationConfig": generation_config,
             },
             timeout=self.timeout_seconds,
         )
@@ -70,6 +77,7 @@ class GoogleProvider:
             total_tokens=usage.get("totalTokenCount"),
             usage=usage,
         )
+        metadata["reasoning_effort"] = self.reasoning_effort if thinking_config else None
         if finish_reason and finish_reason not in {"STOP", "FINISH_REASON_UNSPECIFIED"}:
             raise GenerationValidationError(f"Incomplete provider response: finish_reason={finish_reason}", content, metadata)
         source = cleanup_generated_source(content)

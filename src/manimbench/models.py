@@ -62,3 +62,6 @@ class ScoreResult:
     checks: dict[str, Any]
     rubric: dict[str, Any]
     artifacts: dict[str, str]
+    rank_score: float | None = None
+    pass_gate: dict[str, Any] = field(default_factory=dict)
+    failure_category: str = "pass"

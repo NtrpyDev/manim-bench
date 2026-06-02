@@ -14,6 +14,8 @@ Publishable reports should include:
 - `models/*.html`.
 - `tasks/*.html`.
 - Run manifest with prompt, suite, task, sandbox, and runtime hashes.
+- `data/leaderboard.json` schema `0.6.0`, including capability score,
+  pass rate, coverage, render success, and failure buckets.
 - Links or hosted paths for rendered videos and logs where appropriate.
 
 Use `manimbench publish` to copy report data and videos into the separate site

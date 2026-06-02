@@ -15,6 +15,7 @@ from manimbench.providers.common import (
     system_prompt,
     validate_main_scene,
 )
+from manimbench.reasoning import anthropic_adaptive_thinking_supported, anthropic_reasoning_effort_for_model
 
 
 class AnthropicProvider:
@@ -27,6 +28,7 @@ class AnthropicProvider:
         client: Any | None = None,
         timeout_seconds: int = 240,
         max_tokens: int = 8192,
+        reasoning_effort: str | None = None,
     ):
         config = provider_config("anthropic")
         self.provider_name = "anthropic"
@@ -39,11 +41,22 @@ class AnthropicProvider:
         self.client = client or HttpJsonClient()
         self.timeout_seconds = timeout_seconds
         self.max_tokens = max_tokens
+        self.reasoning_effort = anthropic_reasoning_effort_for_model(self.model_slug, reasoning_effort)
         if not self.api_key:
             raise ProviderError(f"{self.api_key_env} is required for provider {self.provider_name}")
 
     def generate(self, task: Task, prompt: str) -> ModelOutput:
         started = time.monotonic()
+        payload = {
+            "model": self.model_slug,
+            "max_tokens": self.max_tokens,
+            "system": system_prompt(),
+            "messages": [{"role": "user", "content": prompt}],
+        }
+        if self.reasoning_effort:
+            payload["output_config"] = {"effort": self.reasoning_effort}
+            if anthropic_adaptive_thinking_supported(self.model_slug):
+                payload["thinking"] = {"type": "adaptive"}
         response = self.client.post_json(
             f"{self.base_url}/messages",
             headers={
@@ -51,12 +64,7 @@ class AnthropicProvider:
                 "anthropic-version": "2023-06-01",
                 "content-type": "application/json",
             },
-            payload={
-                "model": self.model_slug,
-                "max_tokens": self.max_tokens,
-                "system": system_prompt(),
-                "messages": [{"role": "user", "content": prompt}],
-            },
+            payload=payload,
             timeout=self.timeout_seconds,
         )
         elapsed = time.monotonic() - started
@@ -78,6 +86,7 @@ class AnthropicProvider:
             total_tokens=_sum_tokens(usage.get("input_tokens"), usage.get("output_tokens")),
             usage=usage,
         )
+        metadata["reasoning_effort"] = self.reasoning_effort
         if finish_reason and finish_reason not in {"end_turn", "stop_sequence"}:
             raise GenerationValidationError(f"Incomplete provider response: stop_reason={finish_reason}", content, metadata)
         source = cleanup_generated_source(content)

@@ -115,6 +115,8 @@ def _load_yaml(path: Path) -> dict[str, Any]:
 
 
 def _is_private_model(item: dict[str, Any]) -> bool:
+    if bool(item.get("catalog_hidden")):
+        return True
     tier = str(item.get("tier", "")).lower()
     access = str(item.get("access", "")).lower()
     return tier in {"pro", "enterprise"} or access in {"pro", "enterprise", "private"}

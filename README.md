@@ -20,7 +20,7 @@ For local rendering outside the official container, install the render extras:
 python -m pip install -e ".[dev,render]"
 ```
 
-List the default V0.5 tasks:
+List the default V0.5 task suite, scored by the V0.6 engine:
 
 ```bash
 manimbench list-tasks
@@ -159,7 +159,13 @@ manimbench render \
 
 Reports write human-readable pages plus machine-readable data under
 `reports/<run_id>/data/*.json`. The exported `leaderboard.json` uses schema
-version `0.5.0`.
+version `0.6.0`.
+
+V0.6 rankings use a capability score as the primary model ranking and publish
+pass rate, source coverage, render success, and failure buckets as separate
+fields. Required source terms remain score evidence, but they are no longer a
+hard pass/fail gate by themselves. Because this changes leaderboard semantics,
+official V0.6 results require a fresh full-suite rerun.
 
 ## Reproducibility
 
