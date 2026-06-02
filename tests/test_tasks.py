@@ -7,7 +7,8 @@ from manimbench.tasks import load_suite
 def test_load_default_suite():
     suite = load_suite(DEFAULT_SUITE_PATH)
 
-    assert suite.id == "manimbench-v0.5-public"
+    assert suite.id == "manimbench-v0.6-public"
+    assert suite.version == "0.6.0"
     assert len(suite.tasks) == 6
     assert {task.id for task in suite.tasks} == {
         "coordinate_system_animation",
@@ -33,6 +34,14 @@ def test_load_v04_suite_by_path():
         "probability_distribution",
         "advanced_math_explanation",
     }
+
+
+def test_load_v05_suite_by_path_for_history():
+    suite = load_suite(DEFAULT_SUITE_PATH.parents[1] / "v0.5" / "suite.yaml")
+
+    assert suite.id == "manimbench-v0.5-public"
+    assert suite.version == "0.5.0"
+    assert len(suite.tasks) == 6
 
 
 def test_task_paths_are_absolute():

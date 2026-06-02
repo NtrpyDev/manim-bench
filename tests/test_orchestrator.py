@@ -635,7 +635,7 @@ def test_detail_video_and_publish_summary_are_orchestrator_state(tmp_path):
             {
                 "run_id": "display-state",
                 "models": ["composer-2-5"],
-                "suite": {"id": "v0.5", "version": "0.5", "title": "Suite", "task_count": 1, "task_ids": ["coordinate_system_animation"]},
+                "suite": {"id": "v0.6", "version": "0.6", "title": "Suite", "task_count": 1, "task_ids": ["coordinate_system_animation"]},
                 "sandbox": {"docker_image_digest": "sha256:test"},
             }
         ),

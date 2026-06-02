@@ -27,13 +27,13 @@ def _write_registry(tmp_path):
     openrouter_path = tmp_path / "openrouter.yaml"
     public_path = tmp_path / "public.yaml"
     openrouter_path.write_text(
-        yaml.safe_dump({"schema_version": "0.5.0", "models": {"gpt-5-5": "openai/gpt-5.5"}}, sort_keys=False),
+        yaml.safe_dump({"schema_version": "0.6.0", "models": {"gpt-5-5": "openai/gpt-5.5"}}, sort_keys=False),
         encoding="utf-8",
     )
     public_path.write_text(
         yaml.safe_dump(
             {
-                "schema_version": "0.5.0",
+                "schema_version": "0.6.0",
                 "models": [
                     {
                         "id": "gpt-5-5",

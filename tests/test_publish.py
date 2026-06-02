@@ -17,7 +17,7 @@ def _make_report(tmp_path, run_id="demo"):
     (run_dir / "manifest.json").write_text(
         json.dumps(
             {
-                "schema_version": "0.5.0",
+                "schema_version": "0.6.0",
                 "run_id": run_id,
                 "models": ["m1"],
                 "suite": {"task_ids": ["t1"]},
