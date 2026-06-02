@@ -4,7 +4,7 @@ from pathlib import Path
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_SUITE_PATH = PROJECT_ROOT / "benchmarks" / "v0.5" / "suite.yaml"
+DEFAULT_SUITE_PATH = PROJECT_ROOT / "benchmarks" / "v0.6" / "suite.yaml"
 DEFAULT_PROMPT_PATH = PROJECT_ROOT / "prompt.md"
 DEFAULT_RUNS_DIR = PROJECT_ROOT / "runs"
 DEFAULT_REPORTS_DIR = PROJECT_ROOT / "reports"

@@ -28,7 +28,7 @@ def create_model_workspaces(args: argparse.Namespace) -> int:
         _write_model_workspace(model, suite_path, suite, tasks, master_prompt, force=args.force)
 
     print(f"Created/updated {len(models)} optional model test folders in {WORKSPACES_ROOT}")
-    print("Canonical V0.5 input is plain outputs/<model>/<task_id>.py files.")
+    print("Canonical V0.6 input is plain outputs/<model>/<task_id>.py files.")
     return 0
 
 
@@ -168,7 +168,7 @@ def _readme(model_id: str, display_name: str, suite_id: str, task_count: int) ->
 
 This optional workspace is for testing **{display_name}** when a coding tool works best inside an isolated folder.
 
-The canonical V0.5 input format is plain files under `outputs/<model>/`.
+The canonical V0.6 input format is plain files under `outputs/<model>/`.
 
 ## How To Use
 

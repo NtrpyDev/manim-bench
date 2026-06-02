@@ -75,7 +75,7 @@ def start_wizard(args: argparse.Namespace) -> int:
 
 def _choose_suite_and_tasks() -> tuple[Path, list[str] | None]:
     print("Benchmark size:")
-    print("  1. Public suite (v0.5, six focused tasks)")
+    print("  1. Public suite (v0.6, six focused tasks)")
     print("  2. Smoke test (v0, one quick task)")
     print("  3. Public suite, choose task IDs")
     choice = _prompt("Select option", "1")
