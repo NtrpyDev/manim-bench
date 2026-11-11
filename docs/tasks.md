@@ -1,34 +1,36 @@
-# Adding Benchmark Tasks
+# Writing tasks
 
-Tasks live under versioned suite directories such as `benchmarks/v0.6/tasks/`.
-The default public suite is `benchmarks/v0.6/suite.yaml`; `benchmarks/v0`
-remains as a small smoke-test suite.
-
-Each task should define:
-
-- Stable `id` and `version`.
-- `difficulty`: a stable suite-specific level, such as `focused`, `easy`,
-  `medium`, `hard`, or `extreme`.
-- Mathematical `domains`.
-- A task-specific prompt.
-- Required labels and visual elements.
-- Automated checks.
-- Human review rubric notes.
-
-The public suite may use task packs with this shape:
+A task is one YAML file in a suite's `tasks/` folder, listed in `suite.yaml`.
 
 ```yaml
-defaults:
-  version: "1.0"
-  difficulty: medium
-tasks:
-  - id: example_task
-    domains: [calculus]
-    title: Example Task
-    prompt: Explain the concept visually.
-    required_labels: [concept, equation]
-    required_visuals: [graph, equation]
+id: derivative_motion_story
+version: "0.7.0"
+title: The derivative as the slope of the tangent
+domains: [calculus]
+prompt: |
+  What to teach, in plain words. Fix the example (the function, the matrix)
+  so every model explains the same thing.
+must_show:
+  - id: secant
+    text: A line through two points on the curve, with its slope worked out.
+judge_notes: |
+  The correct mathematics, for the judge to check against.
 ```
 
-After a suite is public, avoid changing task semantics in place. Add a new task
-version or benchmark suite version instead.
+Rules:
+
+- **Everything scored is shown.** `must_show` is printed into the prompt and
+  is what the judge checks item by item. Do not grade anything the prompt
+  does not ask for.
+- **Say what to show, not how to code it.** Never require a particular Manim
+  class or function.
+- **`judge_notes` holds facts only.** It is not shown to the model. It may
+  state what is mathematically correct. It must not add requirements.
+- **Each item must be checkable from frames.** "The tangent line, with its
+  slope stated" can be seen. "A clear explanation" cannot.
+- **Ids are permanent** once results are published.
+
+Every task needs reference scenes in `tests/fixtures/scenes/<task_id>/`:
+`good.py`, a correct, well laid out answer, and `bad_layout.py`, the same
+lesson with deliberate layout faults. The container tests render both and
+check that they score as they should.
