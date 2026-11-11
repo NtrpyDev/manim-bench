@@ -1,48 +1,31 @@
-# ManimBench Master Prompt
+# ManimBench
 
-You are generating a Manim Community Edition animation for a public benchmark.
+You are writing one Manim Community Edition animation that teaches a piece of
+mathematics. The viewer is a student seeing the idea for the first time. The
+video has no narration, so everything has to be understood from what is on
+screen.
 
-## Runtime Contract
+## Runtime
 
-- Use Manim Community Edition only.
-- Import with `from manim import *`.
-- Define exactly one primary scene class named `MainScene`.
-- The scene must render as an MP4 at 60 FPS.
-- The final animation must be no longer than 120 seconds.
-- Do not use network access.
-- Do not read files outside the working directory.
-- Do not require user interaction.
-- Do not depend on external assets unless the task explicitly provides them.
-- Prefer deterministic code and stable layouts.
+- Manim Community Edition {{manim_version}}, Cairo renderer, Python {{python_version}}.
+- Start with `from manim import *`. NumPy and the Python standard library are
+  available. No other packages are.
+- Define one scene class named `{{scene_class}}`. It is the only scene rendered.
+- The scene is rendered at {{resolution}} and {{fps}} frames per second.
+- There is no network, no input, and no files to read. Do not load images,
+  SVGs, sounds, or fonts.
+- LaTeX is a minimal TeX Live install. `amsmath`, `amssymb`, `physics`,
+  `xcolor`, `mathrsfs`, `dsfont`, and `wasysym` are available. `mathtools`,
+  `tikz`, `cancel`, `bm`, and `siunitx` are not.
+- The render is stopped after {{render_timeout_seconds}} seconds of wall time.
 
-## Visual Communication Requirements
+## What makes a good answer
 
-Every important visual element must be clearly labeled in the video:
-
-- Examples.
-- Diagrams.
-- Graphs and axes.
-- Equations.
-- Variables.
-- Coordinates.
-- Transformations.
-- Mathematical objects.
-- Intermediate steps in derivations or proofs.
-
-Use concise, information-dense animation. Avoid unnecessary waits, repeated decorative transitions, filler scenes, and slow pacing. Camera movement should support the explanation rather than distract from it.
-
-## Mathematical Requirements
-
-The animation must be mathematically correct and faithful to the task. Show enough structure that a viewer can understand why the claim, construction, or computation is true.
-
-Do not fake the result by drawing only the final answer while skipping the requested reasoning. Do not hardcode a superficial visual when the task asks for a derivation, dynamic process, or general construction.
-
-## Output Contract
-
-Return only Python source code for the ManimCE scene. Do not wrap it in Markdown fences. Do not include prose outside the code.
-
-The benchmark runner will save your response as `solution.py` and render:
-
-```bash
-python -m manim -qh --fps 60 --media_dir <media_dir> --output_file result solution.py MainScene
-```
+- The mathematics is correct, and the video shows why it is true, not only
+  the final result.
+- Ideas arrive one at a time, in an order a student can follow.
+- Every object that matters is labeled on screen: axes, points, curves,
+  vectors, regions, equations, and the steps of a derivation.
+- Text is large enough to read, stays inside the frame, and does not sit on
+  top of other text.
+- Motion is used to explain. Avoid long stretches where nothing changes.
