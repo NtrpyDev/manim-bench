@@ -9,7 +9,9 @@ The route for benchmarking many vendors' models with one key and one bill.
 
 1. Put the key in the environment as `OPENROUTER_API_KEY`. Setting a credit
    limit on the key itself caps spending on OpenRouter's side.
-2. Set `enabled: true` under `openrouter` in `models/routes.yaml`.
+2. Copy `models/routes.yaml` to `models/routes.local.yaml` and set
+   `enabled: true` under `openrouter` there. Local files are ignored by git, so
+   the repository keeps shipping with every route off.
 3. `manimbench models check` compares `models/models.yaml` with OpenRouter's
    live catalog: slugs, prices, and whether each model accepts images.
 
@@ -30,9 +32,10 @@ rather than an API key. It is for checking the pipeline end to end before
 paying for API calls.
 
 1. `claude` must be installed and logged in.
-2. Set `enabled: true` under `claude-cli` in `models/routes.yaml`.
-3. Pass `--route claude-cli` to `generate` or `run`. To judge through it, set
-   `route: claude-cli` in `models/judges.yaml` and list only Claude models.
+2. Set `enabled: true` under `claude-cli` in `models/routes.local.yaml`.
+3. Pass `--route claude-cli` to `generate` or `run`. To judge through it,
+   copy `models/judges.yaml` to `models/judges.local.yaml`, set
+   `route: claude-cli` there, and list only Claude models.
 
 The command line is an agent by default. This route turns that off: no tools,
 no project files, no user settings or memory, the benchmark's own system

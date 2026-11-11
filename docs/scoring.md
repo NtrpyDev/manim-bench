@@ -33,8 +33,8 @@ is left out and the others are rescaled, and the result says so.
 ### Layout, 25 points
 
 While the scene renders, a small harness inside the container records every
-text object on screen: its string, its bounding box, its font size, the height
-of its tallest character, and its opacity. It records at the start and end of
+text object on screen: its string, its bounding box, the height of its
+tallest character, and its opacity. It records at the start and end of
 every animation, and once a second during animations of three seconds or
 more, so one long animation cannot hide what happens inside it. Layout is
 scored from that record, not from the source code and not from guessing at
@@ -47,10 +47,12 @@ Three problems are measured, each by how many seconds it was on screen:
 - **Overlapping.** Two pieces of text whose boxes overlap by more than 15% of
   the smaller one. Text over a shape is not counted, since a label inside a
   square is normal.
-- **Too small.** Font size under 16, or no character taller than 0.075 scene
-  units (the height of a lowercase LaTeX letter at size 16), after allowing
-  for camera zoom. The second test is measured from the drawn characters, so
-  text shrunk inside LaTeX is caught too.
+- **Too small.** The tallest character is under 0.09 scene units after
+  allowing for camera zoom. The frame is 8 units tall, so that is about 1.1%
+  of its height, or roughly font size 13 for LaTeX and 9 for `Text`. It is
+  measured from the drawn characters. The font size Manim reports is not
+  used, because it is wrong after a `Transform` and blind to sizing inside
+  LaTeX.
 
 Each problem's share of the video is divided by 25%, capped at 1, and takes
 that fraction of its points: 40 for cut off, 40 for overlapping, 20 for too
