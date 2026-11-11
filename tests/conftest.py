@@ -19,6 +19,8 @@ import numpy as np
 import pytest
 
 os.environ["MANIMBENCH_FORBID_LIVE_CALLS"] = "1"
+# Tests check what the repository ships, not this machine's local route switches.
+os.environ["MANIMBENCH_IGNORE_LOCAL_CONFIG"] = "1"
 
 from manimbench.models import RenderResult  # noqa: E402
 from manimbench.providers.base import Completion, ProviderError, Request  # noqa: E402
@@ -65,8 +67,23 @@ def write_video(
     return path
 
 
-def text_item(string: str, box: list[float], *, font_size: float = 36.0, opacity: float = 1.0, kind: str = "text", ident: int = 0) -> dict[str, Any]:
-    return {"id": ident or abs(hash(string)) % 10**9, "kind": kind, "string": string, "box": box, "font_size": font_size, "opacity": opacity}
+def text_item(
+    string: str,
+    box: list[float],
+    *,
+    glyph_height: float = 0.25,
+    opacity: float = 1.0,
+    kind: str = "text",
+    ident: int = 0,
+) -> dict[str, Any]:
+    return {
+        "id": ident or abs(hash(string)) % 10**9,
+        "kind": kind,
+        "string": string,
+        "box": box,
+        "glyph_height": glyph_height,
+        "opacity": opacity,
+    }
 
 
 def snapshot(time: float, text: list[dict[str, Any]], *, projection: str = "2d", frame: dict[str, float] | None = None) -> dict[str, Any]:

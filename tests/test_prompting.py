@@ -44,7 +44,8 @@ class TestEveryTask:
 
     def test_contains_layout_numbers(self, task):
         prompt = _build(task=task)
-        assert "font size 16" in prompt
+        assert "under 0.09 scene units" in prompt
+        assert "font size 13 for Tex and MathTex and 9 for Text" in prompt
         assert "(40% of this part)" in prompt  # clipping
         assert "overlapping other text (40%)" in prompt
         assert "(20%)" in prompt  # small text
@@ -99,10 +100,10 @@ def test_custom_scene_class_appears_in_prompt():
 
 
 def test_changed_font_size_changes_prompt():
-    suite = replace(SUITE, scoring=replace(SUITE.scoring, layout=replace(SUITE.scoring.layout, min_font_size=24.0)))
+    suite = replace(SUITE, scoring=replace(SUITE.scoring, layout=replace(SUITE.scoring.layout, min_glyph_height=0.2)))
     prompt = _build(suite)
-    assert "font size 24" in prompt
-    assert "font size 16" not in prompt
+    assert "under 0.2 scene units" in prompt
+    assert "under 0.09 scene units" not in prompt
 
 
 def test_changed_layout_points_change_prompt():

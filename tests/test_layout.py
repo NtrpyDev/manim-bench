@@ -1,4 +1,4 @@
-"""Tests for the layout score. Defaults: clipping 40, overlap 40, small text 20, saturation 0.25, min font 16, overlap ratio 0.15."""
+"""Tests for the layout score. Defaults: clipping 40, overlap 40, small text 20, saturation 0.25, tallest character 0.09, overlap ratio 0.15."""
 
 from __future__ import annotations
 
@@ -80,24 +80,24 @@ def test_low_opacity_overlapping_label_is_ignored():
 
 
 def test_small_text_loses_20_points():
-    tiny = text_item("tiny", [-1.0, -1.0, 1.0, 1.0], font_size=10.0, ident=7)
+    tiny = text_item("tiny", [-1.0, -1.0, 1.0, 1.0], glyph_height=0.06, ident=7)
     assert score_layout(_steady([tiny]), SETTINGS)["score"] == 80.0
 
 
-def test_font_size_16_is_not_small():
-    assert score_layout(_steady([text_item("x", [-1, -1, 1, 1], font_size=16.0, ident=8)]), SETTINGS)["score"] == 100.0
+def test_text_exactly_at_the_height_limit_is_not_small():
+    assert score_layout(_steady([text_item("x", [-1, -1, 1, 1], glyph_height=0.09, ident=8)]), SETTINGS)["score"] == 100.0
 
 
-def test_zoomed_in_camera_makes_small_font_not_small():
+def test_zoomed_in_camera_makes_small_text_not_small():
     frame = {"cx": 0.0, "cy": 0.0, "width": 7.1111, "height": 4.0}  # zoom 8 / 4 = 2
-    ok = text_item("x", [-1, -1, 1, 1], font_size=10.0, ident=9)  # 10 * 2 = 20 >= 16
+    ok = text_item("x", [-1, -1, 1, 1], glyph_height=0.06, ident=9)  # 0.06 * 2 = 0.12 >= 0.09
     snaps = _wrap([snapshot(0.0, [ok], frame=frame), snapshot(10.0, [ok], frame=frame)])
     assert score_layout(snaps, SETTINGS)["score"] == 100.0
 
 
 def test_zoomed_in_camera_still_flags_text_that_is_too_small():
     frame = {"cx": 0.0, "cy": 0.0, "width": 7.1111, "height": 4.0}
-    tiny = text_item("x", [-1, -1, 1, 1], font_size=7.0, ident=9)  # 7 * 2 = 14 < 16
+    tiny = text_item("x", [-1, -1, 1, 1], glyph_height=0.04, ident=9)  # 0.04 * 2 = 0.08 < 0.09
     snaps = _wrap([snapshot(0.0, [tiny], frame=frame), snapshot(10.0, [tiny], frame=frame)])
     assert score_layout(snaps, SETTINGS)["score"] == 80.0
 
@@ -113,7 +113,7 @@ def test_problem_for_ten_percent_of_time_loses_40_percent_of_that_part():
 
 
 def test_small_text_for_ten_percent_of_time_loses_8_points():
-    tiny = text_item("tiny", [-1, -1, 1, 1], font_size=10.0, ident=7)
+    tiny = text_item("tiny", [-1, -1, 1, 1], glyph_height=0.06, ident=7)
     snaps = _wrap([snapshot(0.0, [tiny]), snapshot(1.0, [GOOD]), snapshot(10.0, [GOOD])])
     assert score_layout(snaps, SETTINGS)["score"] == 92.0  # 20 * 0.4 = 8 lost
 
@@ -125,7 +125,7 @@ def test_problem_share_saturates_at_one():
 
 
 def test_all_three_problems_at_once_scores_zero():
-    both = text_item("both", [6.5, 0.0, 8.0, 1.0], font_size=10.0, ident=10)  # clipped and small
+    both = text_item("both", [6.5, 0.0, 8.0, 1.0], glyph_height=0.06, ident=10)  # clipped and small
     other = text_item("other", [6.5, 0.0, 8.0, 1.0], ident=11)  # overlaps it
     assert score_layout(_steady([both, other]), SETTINGS)["score"] == 0.0
 

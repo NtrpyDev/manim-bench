@@ -206,3 +206,17 @@ def test_judges_file_values_and_defaults(tmp_path):
     assert load_judges(path) == JudgePanel(route="claude-cli", judges=["a", "b"], max_frames=5, max_output_tokens=99)
     path = write(tmp_path / "j2.yaml", "judges: [a]\n")
     assert load_judges(path) == JudgePanel(route="openrouter", judges=["a"], max_frames=12, max_output_tokens=None)
+
+
+def test_a_local_file_replaces_the_shipped_one_and_tests_ignore_it(tmp_path, monkeypatch):
+    from manimbench.registry import load_routes, local_override
+
+    shipped = tmp_path / "routes.yaml"
+    shipped.write_text("default_route: openrouter\nroutes:\n  openrouter: {enabled: false}\n", encoding="utf-8")
+    local = local_override(shipped)
+    assert local.name == "routes.local.yaml"
+    local.write_text("default_route: claude-cli\nroutes:\n  claude-cli: {enabled: true}\n", encoding="utf-8")
+    assert load_routes(shipped)["default_route"] == "openrouter"  # The test session ignores local files.
+    monkeypatch.delenv("MANIMBENCH_IGNORE_LOCAL_CONFIG")
+    assert load_routes(shipped)["default_route"] == "claude-cli"
+    assert load_routes(shipped)["routes"]["claude-cli"]["enabled"] is True

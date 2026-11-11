@@ -182,7 +182,7 @@ def test_text_shrunk_inside_latex_is_caught_as_small(tmp_path, suite, sandbox):
     assert result["gates"]["passed"], result["gates"]
     layout = json.loads((target / "layout.json").read_text(encoding="utf-8"))
     caption = next(item for item in layout["snapshots"][0]["text"] if "too small" in item["string"])
-    assert caption["font_size"] >= 16  # What Manim reports, which would pass on its own.
+    assert caption["font_size"] >= 16  # What Manim reports. It is recorded but never used for scoring.
     assert caption["glyph_height"] < suite.scoring.layout.min_glyph_height
     assert result["layout"]["problem_seconds"]["small_text"] > 0
     assert result["layout"]["score"] == 80.0
@@ -197,4 +197,18 @@ def test_readouts_are_recorded_as_drawn_and_matrix_brackets_are_not_text(tmp_pat
     assert "+1.00" in first and "+3.50" in last
     assert sorted(value for value in first if value != "+1.00") == ["0", "1", "1", "2"]
     assert not any("array" in value or "left" in value for value in first + last)
+    assert result["layout"]["score"] == 100.0
+
+
+def test_a_transformed_label_is_recorded_as_what_it_now_shows(tmp_path, suite, sandbox):
+    result, target = check(tmp_path, suite, sandbox, SCENES / "generic" / "transformed_label.py")
+    assert result["gates"]["passed"], result["gates"]
+    layout = json.loads((target / "layout.json").read_text(encoding="utf-8"))
+    assert [item["string"] for item in layout["snapshots"][0]["text"]] == [r"S_1(x)=\frac{4}{\pi}\sin x"]
+    final = layout["snapshots"][-1]["text"]
+    assert [item["string"] for item in final] == ["terms up to k = 31"]
+    # Manim's own font size for the reshaped object is far below the 32 it was given.
+    assert final[0]["font_size"] < 24
+    assert final[0]["glyph_height"] > suite.scoring.layout.min_glyph_height
+    assert result["layout"]["problem_seconds"]["small_text"] == 0.0
     assert result["layout"]["score"] == 100.0
