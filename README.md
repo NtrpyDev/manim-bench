@@ -56,7 +56,8 @@ python -m pytest
 ## Running the benchmark
 
 Both model routes ship switched off, so nothing can spend money or
-subscription quota by accident. Turn one on in `models/routes.yaml`, then:
+subscription quota by accident. Turn one on in a local copy,
+`models/routes.local.yaml` (see [docs/routes.md](docs/routes.md)), then:
 
 ```bash
 manimbench run --models claude-opus-5-5,gpt-6-1-sol --run-id my-run
