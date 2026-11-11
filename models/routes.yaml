@@ -1,0 +1,15 @@
+# How models are reached. A route that is not enabled refuses every call, so
+# nothing here can spend money or subscription quota by accident. Turn a route
+# on by setting enabled to true.
+schema_version: 1
+default_route: openrouter
+routes:
+  openrouter:
+    enabled: false
+    base_url: https://openrouter.ai/api/v1
+    api_key_env: OPENROUTER_API_KEY
+    timeout_seconds: 900
+  claude-cli:
+    enabled: false
+    command: claude
+    timeout_seconds: 1800

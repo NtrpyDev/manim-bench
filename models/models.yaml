@@ -1,176 +1,107 @@
+# The models the benchmark knows how to call.
+#
+# Each model lists the routes it can be reached through. On OpenRouter every
+# model is pinned to one upstream provider with fallbacks off, so every sample
+# from a model is served the same way. Slugs and provider tags were read from
+# OpenRouter's public catalog on 2026-11-10. `manimbench models check` compares
+# this file against the live catalog. Whether OpenRouter accepts these exact
+# provider tags in a request is unverified until the first live call.
+#
+# reasoning_effort: null means "use the model's own default".
+schema_version: 1
 models:
-- id: composer-2-5
-  display_name: Composer 2.5
-  default_enabled: true
-  pricing: &id001
-    method: configured_benchmark_estimate_rate
-    input_usd_per_1m_tokens: 3.0
-    output_usd_per_1m_tokens: 15.0
-  tokenizer: manimbench_regex_estimator_v1
-- id: opus-4-8
-  display_name: Opus 4.8
-  default_enabled: true
-  pricing:
-    method: configured_benchmark_estimate_rate
-    input_usd_per_1m_tokens: 15.0
-    output_usd_per_1m_tokens: 75.0
-  tokenizer: anthropic_estimate_v1
-- id: gpt-5-5
-  display_name: GPT-5.5
-  default_enabled: true
-  pricing:
-    method: configured_benchmark_estimate_rate
-    input_usd_per_1m_tokens: 5.0
-    output_usd_per_1m_tokens: 20.0
-  tokenizer: openai_estimate_v1
-- id: opus-4-6
-  display_name: Opus 4.6
-  default_enabled: true
-  pricing:
-    method: configured_benchmark_estimate_rate
-    input_usd_per_1m_tokens: 15.0
-    output_usd_per_1m_tokens: 75.0
-  tokenizer: anthropic_estimate_v1
-- id: sonnet-4-6
-  display_name: Sonnet 4.6
-  pricing:
-    method: configured_benchmark_estimate_rate
-    input_usd_per_1m_tokens: 3.0
-    output_usd_per_1m_tokens: 15.0
-  tokenizer: anthropic_estimate_v1
-- id: codex-5-3
-  display_name: Codex 5.3
-  pricing: *id001
-  tokenizer: openai_estimate_v1
-- id: opus-4-7
-  display_name: Opus 4.7
-  pricing:
-    method: configured_benchmark_estimate_rate
-    input_usd_per_1m_tokens: 15.0
-    output_usd_per_1m_tokens: 75.0
-  tokenizer: anthropic_estimate_v1
-- id: grok-build-0-1
-  display_name: Grok Build 0.1
-  pricing: *id001
-  tokenizer: xai_estimate_v1
-- id: gpt-5-4
-  display_name: GPT-5.4
-  pricing:
-    method: configured_benchmark_estimate_rate
-    input_usd_per_1m_tokens: 5.0
-    output_usd_per_1m_tokens: 20.0
-  tokenizer: openai_estimate_v1
-- id: opus-4-5
-  display_name: Opus 4.5
-  pricing:
-    method: configured_benchmark_estimate_rate
-    input_usd_per_1m_tokens: 15.0
-    output_usd_per_1m_tokens: 75.0
-  tokenizer: anthropic_estimate_v1
-- id: gpt-5-2
-  display_name: GPT-5.2
-  pricing:
-    method: configured_benchmark_estimate_rate
-    input_usd_per_1m_tokens: 5.0
-    output_usd_per_1m_tokens: 20.0
-  tokenizer: openai_estimate_v1
-- id: gemini-3-1-pro
-  display_name: Gemini 3.1 Pro
-  pricing: *id001
-  tokenizer: gemini_estimate_v1
-- id: gpt-5-4-mini
-  display_name: GPT-5.4 Mini
-  pricing:
-    method: configured_benchmark_estimate_rate
-    input_usd_per_1m_tokens: 0.6
-    output_usd_per_1m_tokens: 2.4
-  tokenizer: openai_estimate_v1
-- id: gpt-5-4-nano
-  display_name: GPT-5.4 Nano
-  pricing:
-    method: configured_benchmark_estimate_rate
-    input_usd_per_1m_tokens: 0.15
-    output_usd_per_1m_tokens: 0.6
-  tokenizer: openai_estimate_v1
-- id: haiku-4-5
-  display_name: Haiku 4.5
-  pricing:
-    method: configured_benchmark_estimate_rate
-    input_usd_per_1m_tokens: 0.8
-    output_usd_per_1m_tokens: 4.0
-  tokenizer: anthropic_estimate_v1
-- id: grok-4-3
-  display_name: Grok 4.3
-  pricing: *id001
-  tokenizer: xai_estimate_v1
-- id: sonnet-4-5
-  display_name: Sonnet 4.5
-  pricing:
-    method: configured_benchmark_estimate_rate
-    input_usd_per_1m_tokens: 3.0
-    output_usd_per_1m_tokens: 15.0
-  tokenizer: anthropic_estimate_v1
-- id: codex-5-2
-  display_name: Codex 5.2
-  pricing: *id001
-  tokenizer: openai_estimate_v1
-- id: codex-5-1-max
-  display_name: Codex 5.1 Max
-  pricing:
-    method: configured_benchmark_estimate_rate
-    input_usd_per_1m_tokens: 5.0
-    output_usd_per_1m_tokens: 20.0
-  tokenizer: openai_estimate_v1
-- id: gpt-5-1
-  display_name: GPT-5.1
-  pricing:
-    method: configured_benchmark_estimate_rate
-    input_usd_per_1m_tokens: 5.0
-    output_usd_per_1m_tokens: 20.0
-  tokenizer: openai_estimate_v1
-- id: gemini-3-flash
-  display_name: Gemini 3 Flash
-  pricing:
-    method: configured_benchmark_estimate_rate
-    input_usd_per_1m_tokens: 0.5
-    output_usd_per_1m_tokens: 2.0
-  tokenizer: gemini_estimate_v1
-- id: gemini-3-5-flash
-  display_name: Gemini 3.5 Flash
-  pricing:
-    method: configured_benchmark_estimate_rate
-    input_usd_per_1m_tokens: 0.5
-    output_usd_per_1m_tokens: 2.0
-  tokenizer: gemini_estimate_v1
-- id: codex-5-1-mini
-  display_name: Codex 5.1 Mini
-  pricing:
-    method: configured_benchmark_estimate_rate
-    input_usd_per_1m_tokens: 0.6
-    output_usd_per_1m_tokens: 2.4
-  tokenizer: openai_estimate_v1
-- id: sonnet-4
-  display_name: Sonnet 4
-  pricing:
-    method: configured_benchmark_estimate_rate
-    input_usd_per_1m_tokens: 3.0
-    output_usd_per_1m_tokens: 15.0
-  tokenizer: anthropic_estimate_v1
-- id: gpt-5-mini
-  display_name: GPT-5 Mini
-  pricing:
-    method: configured_benchmark_estimate_rate
-    input_usd_per_1m_tokens: 0.6
-    output_usd_per_1m_tokens: 2.4
-  tokenizer: openai_estimate_v1
-- id: gemini-2-5-flash
-  display_name: Gemini 2.5 Flash
-  pricing:
-    method: configured_benchmark_estimate_rate
-    input_usd_per_1m_tokens: 0.5
-    output_usd_per_1m_tokens: 2.0
-  tokenizer: gemini_estimate_v1
-- id: kimi-k2-5
-  display_name: Kimi K2.5
-  pricing: *id001
-  tokenizer: manimbench_regex_estimator_v1
+  - id: claude-fable-5-2
+    name: Claude Fable 5.2
+    vendor: Anthropic
+    reasoning_effort: null
+    max_output_tokens: 64000
+    routes:
+      openrouter: {model: anthropic/claude-fable-5.2, provider: anthropic}
+      claude-cli: {model: claude-fable-5-2}
+  - id: claude-fable-5-1
+    name: Claude Fable 5.1
+    vendor: Anthropic
+    reasoning_effort: null
+    max_output_tokens: 64000
+    routes:
+      openrouter: {model: anthropic/claude-fable-5.1, provider: anthropic}
+      claude-cli: {model: claude-fable-5-1}
+  - id: claude-opus-5-5
+    name: Claude Opus 5.5
+    vendor: Anthropic
+    reasoning_effort: null
+    max_output_tokens: 64000
+    routes:
+      openrouter: {model: anthropic/claude-opus-5.5, provider: anthropic}
+      claude-cli: {model: claude-opus-5-5}
+  - id: claude-sonnet-5-5
+    name: Claude Sonnet 5.5
+    vendor: Anthropic
+    reasoning_effort: null
+    max_output_tokens: 64000
+    routes:
+      openrouter: {model: anthropic/claude-sonnet-5.5, provider: anthropic}
+      claude-cli: {model: claude-sonnet-5-5}
+  - id: gpt-6-astra
+    name: GPT-6 Astra
+    vendor: OpenAI
+    reasoning_effort: null
+    max_output_tokens: 64000
+    routes:
+      openrouter: {model: openai/gpt-6-astra, provider: openai}
+  - id: gpt-6-1-sol
+    name: GPT-6.1 Sol
+    vendor: OpenAI
+    reasoning_effort: null
+    max_output_tokens: 64000
+    routes:
+      openrouter: {model: openai/gpt-6.1-sol, provider: openai}
+  - id: gpt-6-1-terra
+    name: GPT-6.1 Terra
+    vendor: OpenAI
+    reasoning_effort: null
+    max_output_tokens: 64000
+    routes:
+      openrouter: {model: openai/gpt-6.1-terra, provider: openai}
+  - id: gemini-4-carbon
+    name: Gemini 4 Carbon
+    vendor: Google
+    reasoning_effort: null
+    max_output_tokens: 64000
+    routes:
+      openrouter: {model: google/gemini-4-carbon, provider: google-vertex/global}
+  - id: gemini-4-argon
+    name: Gemini 4 Argon
+    vendor: Google
+    reasoning_effort: null
+    max_output_tokens: 64000
+    routes:
+      openrouter: {model: google/gemini-4-argon, provider: google-vertex/global}
+  - id: grok-4-7
+    name: Grok 4.7
+    vendor: xAI
+    reasoning_effort: null
+    max_output_tokens: 64000
+    routes:
+      openrouter: {model: x-ai/grok-4.7, provider: xai}
+  - id: deepseek-v4-pro
+    name: DeepSeek V4 Pro (0813)
+    vendor: DeepSeek
+    reasoning_effort: null
+    max_output_tokens: 64000
+    routes:
+      openrouter: {model: deepseek/deepseek-v4-pro-0813, provider: deepseek}
+  - id: kimi-k3-1-pro
+    name: Kimi K3.1 Pro
+    vendor: Moonshot AI
+    reasoning_effort: null
+    max_output_tokens: 64000
+    routes:
+      openrouter: {model: moonshotai/kimi-k3.1-pro, provider: moonshotai/mxfp4}
+  - id: qwen3-8-max
+    name: Qwen3.8 Max (0902)
+    vendor: Alibaba
+    reasoning_effort: null
+    max_output_tokens: 64000
+    routes:
+      openrouter: {model: qwen/qwen3.8-max-0902, provider: alibaba}

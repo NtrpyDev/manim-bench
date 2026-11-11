@@ -1,0 +1,12 @@
+# The vision judges that review rendered videos. Each judge is a model id from
+# models.yaml, called through the route named here. A panel should include
+# judges from more than one vendor when ranking models, because a judge can
+# favor videos in its own style.
+schema_version: 1
+route: openrouter
+max_frames: 12
+max_output_tokens: 16000
+judges:
+  - claude-opus-5-5
+  - gpt-6-1-sol
+  - gemini-4-carbon
