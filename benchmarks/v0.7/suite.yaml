@@ -24,8 +24,7 @@ scoring:
     overlap_points: 40
     small_text_points: 20
     saturation_share: 0.25
-    min_font_size: 16
-    min_glyph_height: 0.075
+    min_glyph_height: 0.09
     overlap_ratio: 0.15
     frame_tolerance: 0.05
   pacing:
