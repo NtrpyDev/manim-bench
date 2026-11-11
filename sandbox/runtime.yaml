@@ -1,0 +1,8 @@
+# The Manim release every scene is rendered with. To move to a new release,
+# run `manimbench sandbox update <version>`: it pulls that image and rewrites
+# this file. Results record these values, so runs on different Manim versions
+# are never mixed up.
+manim_version: "0.22.1"
+image: manimcommunity/manim
+digest: sha256:af29da8765a26ab1f9f1d61d401e95d50520753634ed8e343fd5c05283a459e7
+python_version: "3.14.10"
