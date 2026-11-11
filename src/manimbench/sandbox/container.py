@@ -1,187 +1,238 @@
+"""Render a scene inside a locked-down container.
+
+Model-written code is untrusted. It runs with no network, a read-only root
+filesystem, no Linux capabilities, as the host user, with CPU, memory and
+process limits. The only place it can write is the sample's own folder.
+"""
+
 from __future__ import annotations
 
-import shutil
+import os
 import subprocess
+import threading
 import time
+import uuid
 from pathlib import Path
 
+from manimbench.media import probe_video
 from manimbench.models import RenderResult
-from manimbench.runtime.manimce import ManimCERuntime, discover_media_files, probe_media
+from manimbench.paths import HARNESS_PATH
+from manimbench.sandbox.settings import SandboxSettings, docker_executable, load_sandbox_settings
+
+VIDEO_NAME = "result.mp4"
+LAYOUT_NAME = "layout.json"
+MAX_LOG_BYTES = 1_000_000
+MAX_FILE_BYTES = 4 * 1024**3
+
+
+class SandboxError(RuntimeError):
+    """The sandbox itself is unusable (no engine, no image). Not a model failure."""
 
 
 class ContainerSandbox:
-    """Official benchmark sandbox using Docker or Podman."""
-
     name = "container"
-    official = True
 
     def __init__(
         self,
-        image: str = "manimbench-manimce:latest",
+        settings: SandboxSettings | None = None,
+        *,
         engine: str | None = None,
         memory: str = "4g",
         cpus: str = "2",
         pids_limit: int = 256,
-        tmpfs_size: str = "512m",
+        tmpfs_size: str = "1g",
+        harness_path: Path = HARNESS_PATH,
     ):
-        self.image = image
-        self.engine = engine or shutil.which("docker") or shutil.which("podman") or "docker"
+        self.settings = settings or load_sandbox_settings()
+        self.engine = engine or docker_executable()
         self.memory = memory
         self.cpus = cpus
         self.pids_limit = pids_limit
         self.tmpfs_size = tmpfs_size
+        self.harness_path = harness_path
 
-    def render(
-        self,
-        run_dir: Path,
-        solution_path: Path,
-        runtime: ManimCERuntime,
-        timeout_seconds: int,
-        fps: int,
-        scene_class: str,
-    ) -> RenderResult:
-        del runtime
-        media_dir = run_dir / "media"
-        logs_dir = run_dir / "logs"
-        media_dir.mkdir(parents=True, exist_ok=True)
-        logs_dir.mkdir(parents=True, exist_ok=True)
-
-        container_solution = f"/work/{solution_path.relative_to(run_dir)}"
-        container_media = "/work/media"
-        render_command = [
-            "python",
-            "-m",
-            "manim",
-            "-qh",
-            "--fps",
-            str(fps),
-            "--media_dir",
-            container_media,
-            "--output_file",
-            "result",
-            "--disable_caching",
-            "--flush_cache",
-            "--progress_bar",
-            "none",
-            container_solution,
-            scene_class,
-        ]
-        command = [
-            self.engine,
-            "run",
-            "--rm",
-            "--network",
-            "none",
-            "--cpus",
-            self.cpus,
-            "--memory",
-            self.memory,
-            "--pids-limit",
-            str(self.pids_limit),
-            "--read-only",
-            "--tmpfs",
-            f"/tmp:rw,noexec,nosuid,size={self.tmpfs_size}",
-            "-v",
-            f"{run_dir}:/work:rw",
-            "-w",
-            "/work",
-            "-e",
-            "OPENBLAS_NUM_THREADS=1",
-            "-e",
-            "OMP_NUM_THREADS=1",
-            "-e",
-            "MKL_NUM_THREADS=1",
-            "-e",
-            "NUMEXPR_NUM_THREADS=1",
-            "-e",
-            "XDG_CACHE_HOME=/tmp",
-            "-e",
-            "MPLCONFIGDIR=/tmp/matplotlib",
-            self.image,
-            *render_command,
-        ]
-
-        timed_out = False
-        started = time.monotonic()
-        try:
-            completed = subprocess.run(
-                command,
-                cwd=run_dir,
-                text=True,
-                capture_output=True,
-                timeout=timeout_seconds,
-                check=False,
-            )
-            exit_code = completed.returncode
-            stdout = completed.stdout
-            stderr = completed.stderr
-        except subprocess.TimeoutExpired as error:
-            timed_out = True
-            exit_code = None
-            stdout = error.stdout or ""
-            stderr = error.stderr or ""
-        elapsed = time.monotonic() - started
-
-        if isinstance(stdout, bytes):
-            stdout = stdout.decode("utf-8", errors="replace")
-        if isinstance(stderr, bytes):
-            stderr = stderr.decode("utf-8", errors="replace")
-
-        (logs_dir / "stdout.log").write_text(stdout, encoding="utf-8")
-        (logs_dir / "stderr.log").write_text(stderr, encoding="utf-8")
-        (logs_dir / "render.log").write_text(
-            "\n".join(
-                [
-                    "$ " + " ".join(command),
-                    "",
-                    "## stdout",
-                    stdout,
-                    "",
-                    "## stderr",
-                    stderr,
-                ]
-            ),
-            encoding="utf-8",
+    def ensure_image(self) -> None:
+        """Fail early, with a useful message, if the pinned image is not present."""
+        completed = subprocess.run(
+            [self.engine, "image", "inspect", self.settings.reference, "--format", "{{.Id}}"],
+            text=True,
+            capture_output=True,
+            timeout=60,
+            check=False,
         )
+        if completed.returncode != 0:
+            raise SandboxError(
+                f"Sandbox image {self.settings.reference} is not available locally. "
+                f"Run `manimbench sandbox pull` first. ({completed.stderr.strip()})"
+            )
 
-        media_files = discover_media_files(media_dir)
-        metadata = {
-            "sandbox": self.name,
-            "official": self.official,
-            "container_image": self.image,
-            "container_image_digest": self._image_digest(),
-            "container_engine": self.engine,
+    def pull(self) -> None:
+        completed = subprocess.run(
+            [self.engine, "pull", self.settings.reference], text=True, capture_output=True, timeout=3600, check=False
+        )
+        if completed.returncode != 0:
+            raise SandboxError(f"Could not pull {self.settings.reference}: {completed.stderr.strip()}")
+
+    def metadata(self) -> dict[str, object]:
+        return {
+            "name": self.name,
+            "engine": Path(self.engine).name,
+            "image": self.settings.image,
+            "image_digest": self.settings.digest,
+            "manim_version": self.settings.manim_version,
+            "python_version": self.settings.python_version,
             "network": "none",
-            "elapsed_seconds": elapsed,
+            "read_only_root": True,
+            "capabilities": "none",
             "memory": self.memory,
             "cpus": self.cpus,
             "pids_limit": self.pids_limit,
             "tmpfs_size": self.tmpfs_size,
-            "media": {str(path.relative_to(run_dir)): probe_media(path) for path in media_files},
         }
+
+    def command(self, sample_dir: Path, container_name: str, *, quality: str, fps: int, scene_class: str) -> list[str]:
+        return [
+            self.engine,
+            "run",
+            "--rm",
+            "--name",
+            container_name,
+            "--network",
+            "none",
+            "--read-only",
+            "--cap-drop",
+            "ALL",
+            "--security-opt",
+            "no-new-privileges",
+            "--user",
+            f"{os.getuid()}:{os.getgid()}",
+            "--cpus",
+            self.cpus,
+            "--memory",
+            self.memory,
+            "--memory-swap",
+            self.memory,
+            "--pids-limit",
+            str(self.pids_limit),
+            "--ulimit",
+            f"fsize={MAX_FILE_BYTES}",
+            "--tmpfs",
+            f"/tmp:rw,noexec,nosuid,size={self.tmpfs_size}",
+            "-e",
+            "HOME=/tmp/home",
+            "-e",
+            "XDG_CACHE_HOME=/tmp/cache",
+            "-e",
+            "MPLCONFIGDIR=/tmp/matplotlib",
+            "-e",
+            "OPENBLAS_NUM_THREADS=1",
+            "-e",
+            "OMP_NUM_THREADS=1",
+            "-v",
+            f"{sample_dir}:/work:rw",
+            "-v",
+            f"{self.harness_path}:/harness/harness.py:ro",
+            "-w",
+            "/work",
+            self.settings.reference,
+            "python",
+            "/harness/harness.py",
+            "solution.py",
+            "--scene",
+            scene_class,
+            "--quality",
+            quality,
+            "--fps",
+            str(fps),
+            "--media-dir",
+            "/work/media",
+            "--layout",
+            f"/work/{LAYOUT_NAME}",
+        ]
+
+    def render(
+        self,
+        sample_dir: Path,
+        *,
+        timeout_seconds: int,
+        quality: str,
+        fps: int,
+        scene_class: str,
+    ) -> RenderResult:
+        """Render ``sample_dir/solution.py``. Everything it writes stays in ``sample_dir``."""
+        sample_dir = sample_dir.resolve()
+        if not (sample_dir / "solution.py").exists():
+            raise FileNotFoundError(f"No solution.py in {sample_dir}")
+        logs_dir = sample_dir / "logs"
+        logs_dir.mkdir(parents=True, exist_ok=True)
+        container_name = f"manimbench-{uuid.uuid4().hex[:16]}"
+        command = self.command(sample_dir, container_name, quality=quality, fps=fps, scene_class=scene_class)
+
+        timed_out = False
+        started = time.monotonic()
+        process = subprocess.Popen(command, cwd=sample_dir, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        captured: dict[str, bytes] = {}
+        pumps = [
+            threading.Thread(target=_pump, args=(process.stdout, "stdout", captured), daemon=True),
+            threading.Thread(target=_pump, args=(process.stderr, "stderr", captured), daemon=True),
+        ]
+        for pump in pumps:
+            pump.start()
+        try:
+            exit_code: int | None = process.wait(timeout=timeout_seconds)
+        except subprocess.TimeoutExpired:
+            timed_out = True
+            exit_code = None
+            # Stopping the client does not stop the container, so kill it by name.
+            subprocess.run([self.engine, "kill", container_name], capture_output=True, timeout=60, check=False)
+            try:
+                process.wait(timeout=30)
+            except subprocess.TimeoutExpired:
+                process.kill()
+                process.wait()
+        for pump in pumps:
+            pump.join(timeout=10)
+        elapsed = time.monotonic() - started
+
+        (logs_dir / "stdout.log").write_bytes(captured.get("stdout", b""))
+        (logs_dir / "stderr.log").write_bytes(captured.get("stderr", b""))
+
+        video = self._find_video(sample_dir)
+        layout = sample_dir / LAYOUT_NAME
         return RenderResult(
-            backend=self.name,
-            official=self.official,
-            command=command,
             exit_code=exit_code,
             timed_out=timed_out,
-            stdout=stdout,
-            stderr=stderr,
-            media_files=[str(path.relative_to(run_dir)) for path in media_files],
-            metadata=metadata,
+            elapsed_seconds=round(elapsed, 3),
+            video=str(video.relative_to(sample_dir)) if video else None,
+            probe=probe_video(video) if video else {},
+            layout_path=LAYOUT_NAME if layout.exists() else None,
+            command=_portable_command(command, sample_dir, self.harness_path),
+            sandbox=self.metadata(),
         )
 
-    def _image_digest(self) -> str | None:
-        try:
-            completed = subprocess.run(
-                [self.engine, "image", "inspect", self.image, "--format", "{{.Id}}"],
-                text=True,
-                capture_output=True,
-                timeout=10,
-                check=False,
-            )
-        except (OSError, subprocess.TimeoutExpired):
-            return None
-        if completed.returncode != 0:
-            return None
-        return completed.stdout.strip() or None
+    @staticmethod
+    def _find_video(sample_dir: Path) -> Path | None:
+        """The finished video only. Partial clips Manim leaves behind are ignored."""
+        candidates = [
+            path
+            for path in (sample_dir / "media" / "videos").glob(f"**/{VIDEO_NAME}")
+            if "partial_movie_files" not in path.parts
+        ]
+        return sorted(candidates)[0] if candidates else None
+
+
+def _pump(stream, name: str, captured: dict[str, bytes]) -> None:
+    """Keep the first part of a stream and drain the rest, so output cannot fill memory or disk."""
+    kept = bytearray()
+    while True:
+        chunk = stream.read(65536)
+        if not chunk:
+            break
+        if len(kept) < MAX_LOG_BYTES:
+            kept.extend(chunk[: MAX_LOG_BYTES - len(kept)])
+    captured[name] = bytes(kept)
+
+
+def _portable_command(command: list[str], sample_dir: Path, harness_path: Path) -> list[str]:
+    """The command with this machine's paths replaced, so results can be published."""
+    return [part.replace(str(sample_dir), "<sample>").replace(str(harness_path), "<harness>") for part in command]

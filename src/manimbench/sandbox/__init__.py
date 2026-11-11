@@ -1,4 +1,4 @@
-from manimbench.sandbox.container import ContainerSandbox
-from manimbench.sandbox.local import LocalSandbox
+from manimbench.sandbox.container import ContainerSandbox, SandboxError
+from manimbench.sandbox.settings import SandboxSettings, load_sandbox_settings
 
-__all__ = ["ContainerSandbox", "LocalSandbox"]
+__all__ = ["ContainerSandbox", "SandboxError", "SandboxSettings", "load_sandbox_settings"]

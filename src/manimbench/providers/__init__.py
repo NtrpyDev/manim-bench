@@ -1,14 +1,23 @@
-from manimbench.providers.base import ModelProvider
-from manimbench.providers.common import GenerationValidationError, ProviderError
-from manimbench.providers.cursor import CursorProvider
-from manimbench.providers.file_provider import FileProvider
-from manimbench.providers.openrouter import OpenRouterProvider
+from manimbench.providers.base import (
+    Completion,
+    LiveCallForbiddenError,
+    ProviderError,
+    Request,
+    Route,
+    RouteDisabledError,
+    TransientProviderError,
+)
+from manimbench.providers.claude_cli import ClaudeCliRoute
+from manimbench.providers.openrouter import OpenRouterRoute
 
 __all__ = [
-    "CursorProvider",
-    "FileProvider",
-    "GenerationValidationError",
-    "ModelProvider",
-    "OpenRouterProvider",
+    "ClaudeCliRoute",
+    "Completion",
+    "LiveCallForbiddenError",
+    "OpenRouterRoute",
     "ProviderError",
+    "Request",
+    "Route",
+    "RouteDisabledError",
+    "TransientProviderError",
 ]
