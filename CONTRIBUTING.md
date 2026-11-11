@@ -1,22 +1,25 @@
-# Contributing To ManimBench
+# Contributing
 
-Contribution guidelines are intentionally short while the benchmark suite is young.
+## Tasks
 
-## Adding Tasks
+See [docs/tasks.md](docs/tasks.md). Every task needs reference scenes, and
+every scored requirement must be shown to the model.
 
-- Add tasks under a versioned suite directory such as `benchmarks/v0/tasks/`.
-- Keep task IDs stable after public release.
-- Include required labels, expected mathematical content, and automated checks.
-- Prefer tasks that evaluate mathematical understanding, not only Manim syntax.
+## Models and routes
 
-## Adding Model Providers
+Add models in `models/models.yaml` and check them with
+`manimbench models check`. See [docs/routes.md](docs/routes.md). A new route
+implements `complete(target, request)` from
+`src/manimbench/providers/base.py` and must refuse to run when
+`MANIMBENCH_FORBID_LIVE_CALLS` is set.
 
-- Implement the provider interface in `src/manimbench/providers/`.
-- Preserve the master prompt exactly.
-- Store provider metadata in result manifests.
+## Tests
 
-## Publishing Results
+`python -m pytest` must pass. No test may call a model: use the fake route
+and fake sandbox in `tests/conftest.py`. Changes to scoring need a test with
+the expected number worked out by hand.
 
-- Use the container sandbox for official results.
-- Record prompt hashes, task versions, runtime versions, sandbox metadata, and scoring version.
-- Do not mark local sandbox runs as official.
+## Results
+
+Official results use the suite's own render settings and sample count, the
+pinned sandbox image, and a judge panel with more than one vendor.
