@@ -44,6 +44,28 @@ class _Recorder:
         self.truncated = False
         self.play_start = 0.0
         self.last_sample = 0.0
+        # After Transform(a, b), a stays in the scene but looks like b. Its own text is stale.
+        self.shown_as: dict[int, Any] = {}
+        self.kept: list[Any] = []  # Holds the objects so their ids are never reused.
+
+    def note_transforms(self, animations: tuple[Any, ...]) -> None:
+        try:
+            from manim import Transform
+
+            for animation in _flatten(animations):
+                if not isinstance(animation, Transform):
+                    continue
+                if getattr(animation, "replace_mobject_with_target_in_scene", False):
+                    continue  # ReplacementTransform puts the target itself in the scene.
+                source = getattr(animation, "mobject", None)
+                target = getattr(animation, "target_mobject", None)
+                if source is None or target is None or source is target:
+                    continue
+                self.shown_as[id(source)] = target
+                self.kept.extend([source, target])
+        except Exception:
+            if len(self.errors) < 20:
+                self.errors.append(traceback.format_exc(limit=3))
 
     def begin_play(self, scene: Any, animations: tuple[Any, ...]) -> None:
         try:
@@ -71,7 +93,7 @@ class _Recorder:
             self.truncated = True
             return
         try:
-            self.snapshots.append(_snapshot(scene, animations, phase, time))
+            self.snapshots.append(_snapshot(scene, animations, phase, time, self.shown_as))
             self.scene_class = type(scene).__name__
             self.camera_class = type(scene.camera).__name__
         except Exception:  # A capture problem must never break the render.
@@ -93,7 +115,30 @@ class _Recorder:
         }
 
 
-def _snapshot(scene: Any, animations: tuple[Any, ...], phase: str, time: float | None) -> dict[str, Any]:
+def _flatten(animations: Any, depth: int = 0) -> list[Any]:
+    """Animations inside groups such as AnimationGroup, Succession and LaggedStart."""
+    found: list[Any] = []
+    if depth > 6:
+        return found
+    for animation in animations or ():
+        found.append(animation)
+        found.extend(_flatten(getattr(animation, "animations", None), depth + 1))
+    return found
+
+
+def _shown(mobject: Any, shown_as: dict[int, Any]) -> Any:
+    """The object whose text this one currently displays."""
+    for _ in range(20):
+        target = shown_as.get(id(mobject))
+        if target is None:
+            break
+        mobject = target
+    return mobject
+
+
+def _snapshot(
+    scene: Any, animations: tuple[Any, ...], phase: str, time: float | None, shown_as: dict[int, Any]
+) -> dict[str, Any]:
     camera = scene.camera
     frame = _frame(camera)
     items: list[dict[str, Any]] = []
@@ -101,7 +146,7 @@ def _snapshot(scene: Any, animations: tuple[Any, ...], phase: str, time: float |
     mobject_count = 0
     for top in list(scene.mobjects) + list(getattr(scene, "foreground_mobjects", [])):
         mobject_count += 1
-        _collect_text(top, items, seen)
+        _collect_text(top, items, seen, shown_as)
     return {
         "time": round(float(scene.time if time is None else time), 4),
         "phase": phase,
@@ -137,19 +182,21 @@ def _text_kind(mobject: Any) -> str | None:
     return None
 
 
-def _collect_text(mobject: Any, items: list[dict[str, Any]], seen: set[int]) -> None:
+def _collect_text(mobject: Any, items: list[dict[str, Any]], seen: set[int], shown_as: dict[int, Any]) -> None:
     if id(mobject) in seen or len(items) >= MAX_ITEMS_PER_SNAPSHOT:
         return
     seen.add(id(mobject))
     _skip_brackets(mobject, seen)
-    kind = _text_kind(mobject)
+    shown = _shown(mobject, shown_as)
+    kind = _text_kind(shown) or _text_kind(mobject)
     if kind is not None:
-        item = _text_item(mobject, kind)
+        # Position and size come from what is in the scene; the words come from what it shows.
+        item = _text_item(mobject, kind, shown if _text_kind(shown) else mobject)
         if item is not None:
             items.append(item)
         return  # A text mobject is one item; its glyphs are not separate labels.
     for child in getattr(mobject, "submobjects", []):
-        _collect_text(child, items, seen)
+        _collect_text(child, items, seen, shown_as)
 
 
 def _skip_brackets(mobject: Any, seen: set[int]) -> None:
@@ -161,7 +208,7 @@ def _skip_brackets(mobject: Any, seen: set[int]) -> None:
             seen.add(id(bracket))
 
 
-def _text_item(mobject: Any, kind: str) -> dict[str, Any] | None:
+def _text_item(mobject: Any, kind: str, shown: Any) -> dict[str, Any] | None:
     if not mobject.family_members_with_points():
         return None
     opacity = _opacity(mobject)
@@ -180,7 +227,7 @@ def _text_item(mobject: Any, kind: str) -> dict[str, Any] | None:
     return {
         "id": id(mobject),
         "kind": kind,
-        "string": _string(mobject, kind)[:MAX_STRING],
+        "string": _string(shown, kind)[:MAX_STRING],
         "box": [round(value, 4) for value in box],
         "font_size": _font_size(mobject),
         "glyph_height": _glyph_height(mobject),
@@ -247,6 +294,7 @@ def _install(recorder: _Recorder) -> None:
     def play(self: Any, *args: Any, **kwargs: Any) -> Any:
         recorder.begin_play(self, args)
         result = original_play(self, *args, **kwargs)
+        recorder.note_transforms(args)
         recorder.capture(self, args, "end")
         return result
 

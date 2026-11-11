@@ -52,8 +52,7 @@ class LayoutSettings:
     overlap_points: float = 40.0
     small_text_points: float = 20.0
     saturation_share: float = 0.25
-    min_font_size: float = 16.0
-    min_glyph_height: float = 0.075
+    min_glyph_height: float = 0.09
     overlap_ratio: float = 0.15
     frame_tolerance: float = 0.05
 

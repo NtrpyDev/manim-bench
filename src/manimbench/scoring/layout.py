@@ -132,11 +132,10 @@ def _snapshot_problems(snapshot: dict[str, Any], settings: LayoutSettings) -> di
         visible.append(item)
         if x0 < left or x1 > right or y0 < bottom or y1 > top:
             clipped.append(_label(item))
-        size = item["font_size"]
+        # Judged by the drawn characters. The font size Manim reports is not used: it is wrong
+        # after a Transform and blind to sizing inside LaTeX.
         glyph = item["glyph_height"]
-        if (size is not None and size * zoom < settings.min_font_size) or (
-            glyph is not None and glyph * zoom < settings.min_glyph_height
-        ):
+        if glyph is not None and glyph * zoom < settings.min_glyph_height:
             small.append(_label(item))
 
     overlapping: list[str] = []
@@ -184,14 +183,12 @@ def _clean_snapshots(layout: dict[str, Any] | None) -> list[dict[str, Any]]:
                 box = [float(value) for value in item["box"]]
                 if len(box) != 4 or box[2] <= box[0] or box[3] <= box[1]:
                     continue
-                size = item.get("font_size")
                 glyph = item.get("glyph_height")
                 snapshot["text"].append(
                     {
                         "kind": str(item.get("kind", "text")),
                         "string": str(item.get("string", "")),
                         "box": box,
-                        "font_size": float(size) if isinstance(size, (int, float)) else None,
                         "glyph_height": float(glyph) if isinstance(glyph, (int, float)) and glyph > 0 else None,
                         "opacity": float(item.get("opacity", 1.0)),
                     }

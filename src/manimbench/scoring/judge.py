@@ -22,7 +22,7 @@ FRAME_LEAD_SECONDS = 0.05
 JUDGE_SYSTEM_PROMPT = """\
 You are grading a silent mathematics animation for a benchmark of teaching quality.
 
-You are shown still frames from the video in time order. For each frame you also get the text that was on screen, read directly from the renderer, so you can trust it even when the frame is small.
+You are shown still frames from the video in time order. For each frame you also get the text the renderer recorded on screen, to help you read small text. The frame is the truth: where the two disagree, go by what you see.
 
 Rules:
 - Grade only what the frames and on-screen text show. Do not give credit for anything you cannot see.

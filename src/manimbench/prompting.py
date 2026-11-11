@@ -11,6 +11,11 @@ from pathlib import Path
 
 from manimbench.models import Suite, Task
 
+# Height of a capital letter per point of font size, measured in the pinned Manim image:
+# Tex("H", font_size=48) is 0.3402 units tall and Text("H", font_size=48) is 0.4758.
+LATEX_CAPITAL_HEIGHT_PER_POINT = 0.3402 / 48
+TEXT_CAPITAL_HEIGHT_PER_POINT = 0.4758 / 48
+
 _RESOLUTIONS = {"l": "854x480", "m": "1280x720", "h": "1920x1080", "p": "2560x1440", "k": "3840x2160"}
 
 
@@ -81,10 +86,12 @@ def scoring_section(suite: Suite) -> str:
             *[f"  {line}" for line in criteria_lines],
             f"- Layout, {_number(scoring.layout_weight)} points, measured from the positions of the text on screen. "
             f"Points are lost for text cut off by the edge of the frame ({_number(layout.clipping_points)}% of this "
-            f"part), text overlapping other text ({_number(layout.overlap_points)}%), and text smaller than font "
-            f"size {_number(layout.min_font_size)} or with no character taller than {_number(layout.min_glyph_height)} "
-            f"scene units, so shrinking text inside LaTeX counts too ({_number(layout.small_text_points)}%). "
-            f"Each loss grows with how "
+            f"part), text overlapping other text ({_number(layout.overlap_points)}%), and text too small to read "
+            f"({_number(layout.small_text_points)}%): its tallest character is under "
+            f"{_number(layout.min_glyph_height)} scene units, which is about font size "
+            f"{_number(round(layout.min_glyph_height / LATEX_CAPITAL_HEIGHT_PER_POINT))} for Tex and MathTex and "
+            f"{_number(round(layout.min_glyph_height / TEXT_CAPITAL_HEIGHT_PER_POINT))} for Text. This is measured "
+            f"from the drawn characters, so shrinking text with scale or inside LaTeX counts. Each loss grows with how "
             f"long the problem is on screen and is at its maximum at {saturation}% of the video.",
             f"- Pacing, {_number(scoring.pacing_weight)} points. Points are lost for stretches longer than "
             f"{_number(pacing.max_still_seconds)} seconds where nothing on screen changes.",

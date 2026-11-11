@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -40,7 +41,22 @@ class JudgePanel:
     max_output_tokens: int | None
 
 
+IGNORE_LOCAL_ENV = "MANIMBENCH_IGNORE_LOCAL_CONFIG"
+
+
+def local_override(path: Path) -> Path:
+    """``routes.local.yaml`` next to ``routes.yaml``, and so on.
+
+    A local file replaces the shipped one on this machine and is ignored by git.
+    That is how a route is turned on without changing what the repository ships.
+    """
+    return path.with_name(path.stem + ".local" + path.suffix)
+
+
 def _load(path: Path) -> dict[str, Any]:
+    override = local_override(path)
+    if override.exists() and not os.environ.get(IGNORE_LOCAL_ENV):
+        path = override
     data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
     if not isinstance(data, dict):
         raise ValueError(f"Expected a mapping in {path}")
@@ -109,7 +125,8 @@ def make_route(name: str, path: Path = ROUTES_PATH) -> Route:
         raise KeyError(f"Unknown route: {name}")
     if not config.get("enabled", False):
         raise RouteDisabledError(
-            f"The {name} route is switched off. Set enabled: true for it in {path} to allow live calls."
+            f"The {name} route is switched off. To allow live calls, copy {path.name} to "
+            f"{local_override(path).name} in the same folder and set enabled: true for it there."
         )
     if name == "openrouter":
         return OpenRouterRoute(
