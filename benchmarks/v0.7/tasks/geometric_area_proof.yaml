@@ -1,0 +1,27 @@
+id: geometric_area_proof
+version: "0.7.0"
+title: The Pythagorean theorem by rearrangement
+domains: [geometry, proof]
+prompt: |
+  Prove the Pythagorean theorem with the rearrangement proof. Place four
+  copies of a right triangle with legs a and b and hypotenuse c inside a
+  square of side a + b in two different ways, and compare the area left
+  uncovered each time.
+must_show:
+  - id: triangle
+    text: A right triangle with its legs labeled a and b, its hypotenuse labeled c, and the right angle marked.
+  - id: first_arrangement
+    text: A square of side a + b holding four copies of the triangle so that the uncovered region is one square of side c.
+  - id: second_arrangement
+    text: The same four triangles moved inside the same square so that the uncovered region is two squares, of sides a and b.
+  - id: same_area
+    text: A statement that the uncovered area is the same in both arrangements, with the reason.
+  - id: conclusion
+    text: The conclusion a^2 + b^2 = c^2 written on screen.
+judge_notes: |
+  The outer square has area (a + b)^2 and the four triangles cover 4 * (ab/2)
+  = 2ab in both arrangements, so the uncovered area is equal. In the first
+  arrangement it is a tilted square of side c, area c^2. In the second it is
+  a square of side a plus a square of side b. Hence a^2 + b^2 = c^2. The
+  triangles must be congruent and must not overlap, and the tilted region is
+  a square because the two acute angles of the triangle sum to 90 degrees.

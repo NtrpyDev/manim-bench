@@ -1,0 +1,26 @@
+id: coordinate_system_animation
+version: "0.7.0"
+title: Building a graph point by point
+domains: [algebra, coordinate_geometry]
+prompt: |
+  Teach how the graph of an equation is made of points. Use the parabola
+  y = x^2 / 2 - 1 for x from -3 to 3. Show a point moving along the curve and
+  make clear that at every moment its two coordinates satisfy the equation.
+must_show:
+  - id: labeled_axes
+    text: A coordinate plane with labeled x and y axes, numbered ticks, and the origin marked.
+  - id: equation
+    text: The equation of the curve written on screen.
+  - id: moving_point
+    text: A point that moves along the curve and leaves the curve behind it as a trace.
+  - id: live_coordinates
+    text: A readout of the point's coordinates that updates as the point moves.
+  - id: checked_points
+    text: At least three stops where the point's x value is put into the equation and the result matches its y value.
+  - id: projections
+    text: Guide lines from the point to both axes showing where its x and y values come from.
+judge_notes: |
+  The curve is y = x^2 / 2 - 1. Correct values include (-2, 1), (0, -1),
+  (2, 1), (-3, 3.5), (3, 3.5), (1, -0.5). The lowest point is (0, -1) and the
+  curve is symmetric about the y axis. It crosses the x axis at x = +-sqrt(2),
+  about +-1.41.

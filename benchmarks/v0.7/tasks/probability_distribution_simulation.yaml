@@ -1,0 +1,25 @@
+id: probability_distribution_simulation
+version: "0.7.0"
+title: The distribution of the sum of two dice
+domains: [probability]
+prompt: |
+  Teach where a probability distribution comes from, using the sum X of two
+  fair six-sided dice. Count the equally likely outcomes behind each sum,
+  turn the counts into probabilities, and find the expected value. Use the
+  exact probabilities, not random samples.
+must_show:
+  - id: outcomes
+    text: All 36 equally likely outcomes of the two dice, arranged so the outcomes for a given sum can be picked out.
+  - id: worked_probability
+    text: One probability worked through from its outcomes, for example P(X = 7) = 6/36.
+  - id: bar_chart
+    text: A bar chart of P(X = k) for k from 2 to 12 with both axes labeled.
+  - id: total
+    text: A check that the probabilities add up to 1.
+  - id: expected_value
+    text: The expected value marked on the chart, with the formula used to get it.
+judge_notes: |
+  The number of outcomes for sums 2 through 12 is 1, 2, 3, 4, 5, 6, 5, 4, 3,
+  2, 1, out of 36. P(X = 7) = 6/36 = 1/6 is the largest. The distribution is
+  symmetric about 7. The probabilities sum to 36/36 = 1. The expected value
+  is E[X] = sum of k * P(X = k) = 7.

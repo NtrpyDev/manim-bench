@@ -1,0 +1,26 @@
+id: matrix_transformation_grid
+version: "0.7.0"
+title: A matrix as a transformation of the plane
+domains: [linear_algebra]
+prompt: |
+  Teach how a 2x2 matrix moves the whole plane. Use the matrix with rows
+  (2, 1) and (0, 1). Show that its columns are where the two basis vectors
+  land, that every other vector follows from that, and what the determinant
+  measures.
+must_show:
+  - id: matrix
+    text: The matrix written on screen.
+  - id: grid
+    text: A grid of the plane shown before the transformation and moving to its position after it.
+  - id: basis_vectors
+    text: The two basis vectors, labeled, landing on (2, 0) and (1, 1), tied to the columns of the matrix.
+  - id: sample_vector
+    text: One other vector with its coordinates before and after, with the arithmetic that takes one to the other.
+  - id: area
+    text: The unit square becoming a parallelogram, with its new area linked to the determinant.
+judge_notes: |
+  The matrix is [[2, 1], [0, 1]]. Its columns are (2, 0) and (1, 1), so the
+  first basis vector goes to (2, 0) and the second to (1, 1). A vector (x, y)
+  goes to (2x + y, y); for example (1, 2) goes to (4, 2) and (1, 1) goes to
+  (3, 1). The determinant is 2*1 - 1*0 = 2, so areas double: the unit square
+  becomes a parallelogram of area 2. Horizontal lines stay horizontal.

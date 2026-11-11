@@ -1,0 +1,27 @@
+id: derivative_motion_story
+version: "0.7.0"
+title: The derivative as the slope of the tangent
+domains: [calculus]
+prompt: |
+  Teach what a derivative is, using f(x) = x^2. Start from the slope of a line
+  through two points on the curve, bring the second point toward the first,
+  and show that the slope settles on one number. Then state the general
+  result.
+must_show:
+  - id: graph
+    text: The graph of f(x) = x^2 on labeled axes.
+  - id: secant
+    text: A line through two points on the curve, with its slope worked out as rise over run.
+  - id: approach
+    text: The second point moving toward the first while the slope value on screen updates.
+  - id: tangent
+    text: The tangent line at the fixed point, with its slope stated.
+  - id: limit_definition
+    text: The limit definition of the derivative written on screen.
+  - id: general_result
+    text: The result f'(x) = 2x, checked at a second point on the curve.
+judge_notes: |
+  For f(x) = x^2 the slope of the line through x = a and x = a + h is 2a + h,
+  which tends to 2a as h tends to 0. At a = 1 the tangent slope is 2; at
+  a = 2 it is 4; at a = -1 it is -2; at a = 0 it is 0. The definition is
+  f'(a) = lim h->0 of (f(a + h) - f(a)) / h.

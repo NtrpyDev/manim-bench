@@ -1,0 +1,60 @@
+id: manimbench-v0.7
+version: "0.7.0"
+title: ManimBench 0.7
+description: >
+  Six tasks that ask a model to teach a piece of mathematics with one Manim
+  Community Edition animation. Each video is rendered in a sandbox and scored
+  from what is on screen.
+runtime:
+  scene_class: MainScene
+  quality: h
+  fps: 60
+  min_duration_seconds: 15
+  max_duration_seconds: 120
+  render_timeout_seconds: 900
+samples_per_task: 3
+scoring:
+  weights:
+    judge: 65
+    layout: 25
+    pacing: 10
+  must_show_criterion: task_coverage
+  layout:
+    clipping_points: 40
+    overlap_points: 40
+    small_text_points: 20
+    saturation_share: 0.25
+    min_font_size: 16
+    min_glyph_height: 0.075
+    overlap_ratio: 0.15
+    frame_tolerance: 0.05
+  pacing:
+    max_still_seconds: 8
+    min_active_seconds: 2
+    min_active_share: 0.10
+    max_blank_share: 0.5
+judge:
+  criteria:
+    - id: correctness
+      weight: 30
+      question: Is the mathematics shown on screen correct?
+    - id: explanation
+      weight: 25
+      question: >
+        Does the video build the idea step by step, so a student seeing it for
+        the first time could follow why it is true?
+    - id: task_coverage
+      weight: 25
+      question: Does the video show everything the task asked for?
+    - id: clarity
+      weight: 20
+      question: >
+        Is the picture easy to read, with clear labels, sensible use of color
+        and space, and nothing cluttered or confusing?
+tasks:
+  - tasks/coordinate_system_animation.yaml
+  - tasks/derivative_motion_story.yaml
+  - tasks/matrix_transformation_grid.yaml
+  - tasks/geometric_area_proof.yaml
+  - tasks/probability_distribution_simulation.yaml
+  - tasks/fourier_series_decomposition.yaml

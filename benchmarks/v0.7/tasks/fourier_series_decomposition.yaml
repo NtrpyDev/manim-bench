@@ -1,0 +1,26 @@
+id: fourier_series_decomposition
+version: "0.7.0"
+title: Building a square wave from sine waves
+domains: [analysis, signals]
+prompt: |
+  Teach how a square wave can be built by adding sine waves. Use the square
+  wave that alternates between 1 and -1 with period 2*pi. Add the odd
+  harmonics one at a time and show the sum getting closer to the square wave.
+must_show:
+  - id: target
+    text: The square wave being approximated, drawn on labeled axes.
+  - id: harmonics
+    text: The first three terms, for k = 1, 3 and 5, each drawn as its own sine wave and labeled with its formula.
+  - id: partial_sums
+    text: The running sum redrawn each time a term is added, at least three times, next to the square wave.
+  - id: series_formula
+    text: The formula for the whole series written on screen.
+  - id: behavior
+    text: A statement of what happens as more terms are added.
+judge_notes: |
+  The series is f(x) = (4/pi) * sum over odd k of sin(kx)/k = (4/pi) * (sin x
+  + sin(3x)/3 + sin(5x)/5 + ...). The amplitudes are 4/pi (about 1.27),
+  4/(3 pi) (about 0.42) and 4/(5 pi) (about 0.25). Only odd harmonics appear.
+  More terms give a closer fit away from the jumps; an overshoot of about 9
+  percent of the jump remains next to each jump (the Gibbs phenomenon).
+  Saying the overshoot disappears is wrong; saying the fit improves is right.
