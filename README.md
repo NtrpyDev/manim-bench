@@ -1,179 +1,89 @@
 # ManimBench
 
-ManimBench is a sandboxed benchmark for evaluating how well AI models generate
-high-quality [Manim Community Edition](https://www.manim.community/) animations
-and visually explain mathematics.
+ManimBench measures how well AI models teach mathematics. Each model is asked
+to write one [Manim Community Edition](https://www.manim.community/) animation
+that explains an idea to a student. The animation is rendered in a locked-down
+container and scored from what is on screen.
 
-The engine repo contains the benchmark runner, task suites, provider adapters,
-scoring, reports, and publish handoff. The public site is published from a
-separate site repository; this repo does not contain a `website/` tree.
+No official results have been published from this version yet.
+
+## How a video is scored
+
+A video first has to pass every gate. Failing one scores zero.
+
+- The reply is valid Python with the scene class in it.
+- It renders without an error, inside the time limit.
+- The video is between 15 and 120 seconds long.
+- It is not blank, and something on screen changes.
+
+A video that passes gets a score from 0 to 100:
+
+| Part | Points | Where it comes from |
+| --- | --- | --- |
+| Review | 65 | Vision models rate frames from the video for correct maths, step-by-step explanation, coverage of what the task asked for, and clarity. |
+| Layout | 25 | Measured from the real position of every piece of text during the render: cut off by the frame, overlapping other text, or too small to read. |
+| Pacing | 10 | Measured from the video: long stretches where nothing changes. |
+
+Every rule above is written into the prompt the model receives. Each task is
+sampled several times per model, and a model's score is the mean over tasks.
+The full method is in [docs/scoring.md](docs/scoring.md).
 
 ## Quickstart
 
+Needs Python 3.11 or newer and Docker.
+
 ```bash
 python -m pip install -e ".[dev]"
+manimbench sandbox pull          # the pinned Manim image, about 2 GB
+manimbench tasks                 # list the tasks
+manimbench prompt --task fourier_series_decomposition
 ```
 
-For local rendering outside the official container, install the render extras:
+Render and measure one scene file. No model is called:
 
 ```bash
-python -m pip install -e ".[dev,render]"
+manimbench check tests/fixtures/scenes/fourier_series_decomposition/good.py \
+  --task fourier_series_decomposition --quality l --fps 15
 ```
 
-List the default V0.6 public suite:
+Run the tests. The container tests render real scenes and are skipped when
+Docker or the image is missing:
 
 ```bash
-manimbench list-tasks
+python -m pytest
 ```
 
-Generate outputs through the provider registry. `auto` is the default: it uses
-OpenRouter for public API models and Cursor Agent CLI for Composer 2.5.
+## Running the benchmark
+
+Both model routes ship switched off, so nothing can spend money or
+subscription quota by accident. Turn one on in `models/routes.yaml`, then:
 
 ```bash
-manimbench generate --model composer-2-5 --provider cursor --output-dir outputs --smoke
+manimbench run --models claude-opus-5-5,gpt-6-1-sol --run-id my-run
 ```
 
-Run and report those generated files:
+That one command asks the models, renders and measures every answer, sends
+the videos to the judge panel, and writes a report to `reports/my-run/`.
+Stopping and restarting it repeats nothing that already finished. Each step
+can also be run alone: `generate`, `render`, `judge`, `report`. See
+[docs/running.md](docs/running.md) and [docs/routes.md](docs/routes.md).
 
-```bash
-manimbench run-file-matrix \
-  --model-output composer-2-5=outputs/composer-2-5 \
-  --sandbox container \
-  --parallel 2 \
-  --run-id v06-composer-2-5
-
-manimbench report --run-dir runs/v06-composer-2-5
-```
-
-Publish report data and videos to the separate site repository:
-
-```bash
-manimbench publish \
-  --run-dir runs/v06-composer-2-5 \
-  --target draft \
-  --site-repo ../manimbench-site
-```
-
-See [docs/reproduce.md](docs/reproduce.md),
-[docs/cursor-composer.md](docs/cursor-composer.md), and
-[docs/publish-to-site.md](docs/publish-to-site.md) for the full workflows.
-
-## Project Layout
+## Project layout
 
 ```text
-manimbench/
-  prompt.md                 # Shared model instructions, used for every task.
-  benchmarks/v0.6/          # Default six-task public benchmark suite.
-  benchmarks/v0.5/          # Previous six-task public benchmark suite.
-  benchmarks/v0.4/          # Older six-task public benchmark suite.
-  benchmarks/v0.3/          # Older one-video composite benchmark suite.
-  benchmarks/v2/            # Previous composite benchmark suite.
-  benchmarks/v1/            # Legacy multi-task public suite.
-  src/manimbench/           # Orchestrator, CLI, providers, sandbox, scoring.
-  sandbox/                  # Container image for official benchmark runs.
-  models/                   # Public model registry and provider routes.
-  runs/                     # Generated run artifacts, ignored by git.
-  reports/                  # Static reports and JSON exports, ignored by git.
-  outputs/                  # Generated model outputs, ignored by git.
-  docs/                     # Contributor and methodology docs.
+.gitignore           Files git ignores: caches, secrets, generated output.
+README.md            This file.
+LICENSE              MIT license.
+CONTRIBUTING.md      How to add tasks, models and routes.
+pyproject.toml       Package metadata and dependencies.
+prompt.md            The shared part of the prompt every model receives.
+benchmarks/          Task suites. v0.7 is the current one.
+models/              The model list, the route switches, and the judge panel.
+sandbox/             The one file that pins the Manim version and image.
+src/manimbench/      The benchmark: CLI, routes, sandbox, scoring, report.
+tests/               Unit tests, and real scenes rendered in the container.
+docs/                Method and how-to documents.
 ```
 
-## Output Contract
-
-The default suite is `benchmarks/v0.6/suite.yaml`. Each generated output is one
-Python file under:
-
-```text
-outputs/<model>/<task_id>.py
-```
-
-Each file must define a ManimCE scene class named `MainScene`, render at 60 FPS,
-and stay under the 120 second task limit. Earlier suites remain runnable by path:
-
-```bash
-manimbench --suite benchmarks/v0.4/suite.yaml list-tasks
-manimbench --suite benchmarks/v0.4/suite.yaml run-file-matrix \
-  --model-output my-model=outputs/my-model \
-  --sandbox local
-```
-
-## Generation
-
-`generate` and `generate-batch` default to `--provider auto`. Auto routes
-`composer-2-5` through Cursor Agent CLI because OpenRouter does not currently
-publish a Composer model slug; other public models route through OpenRouter.
-Direct provider routes are exposed for bypass testing:
-
-```bash
-manimbench list-models --public
-
-cursor-agent login
-manimbench generate --model composer-2-5 --provider cursor --output-dir outputs
-
-export OPENROUTER_API_KEY=...
-manimbench generate-batch \
-  --models gpt-5-5,opus-4-8 \
-  --provider auto \
-  --output-dir outputs \
-  --parallel 2 \
-  --smoke
-```
-
-Generation is resumable. Complete files are skipped unless `--force` is passed.
-Checkpoint state is written to `.manimbench/runs/<run_id>/state.json`, and API
-call records are appended to `.manimbench/runs/<run_id>/generation.log`.
-Provider usage is also summarized in `outputs/<model>/usage.json` when real
-token or cost data is available. Cursor Agent CLI does not return token/cost
-metadata, so Cursor spend remains visible in the Cursor dashboard.
-
-## Rendering And Reports
-
-Run a prepared output folder:
-
-```bash
-manimbench run \
-  --model my-model \
-  --provider file \
-  --outputs-dir outputs/my-model \
-  --sandbox local
-```
-
-Run multiple models with bounded concurrency:
-
-```bash
-manimbench run-file-matrix \
-  --model-output model-a=outputs/model-a \
-  --model-output model-b=outputs/model-b \
-  --parallel 2 \
-  --sandbox container
-```
-
-Render and score one saved solution:
-
-```bash
-manimbench render \
-  --model my-model \
-  --task-id coordinate_system_animation \
-  --solution outputs/my-model/coordinate_system_animation.py \
-  --sandbox local
-```
-
-Reports write human-readable pages plus machine-readable data under
-`reports/<run_id>/data/*.json`. The exported `leaderboard.json` uses schema
-version `0.6.0`.
-
-V0.6 rankings use a capability score as the primary model ranking and publish
-pass rate, source coverage, render success, and failure buckets as separate
-fields. Required source terms remain score evidence, but they are no longer a
-hard pass/fail gate by themselves. Because this changes leaderboard semantics,
-official V0.6 results require a fresh full-suite rerun.
-
-## Reproducibility
-
-Run manifests are immutable once created. They record the suite metadata,
-prompt hash, task hashes, configured OpenRouter slugs, provider route, Docker
-image digest when available, git commit, scoring version, and publish history
-reference.
-
-Official results should use the container sandbox. The local subprocess backend
-is for development and debugging; local results are marked `official: false`.
+Generated folders, ignored by git: `outputs/` (model answers), `runs/`
+(renders and results), `reports/` (report pages and data).
